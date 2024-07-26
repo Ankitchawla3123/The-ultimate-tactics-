@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import usePlayerData from '../hooks/usePlayerData.js';
 import Moveable from "react-moveable";
+import useBreakpoint from '../hooks/useBreakpoint.js';
+import useViewportResize from '../hooks/useViewportResize.js';
 
 function Board({ children }) {
-  const viewportwidth = 56;
+  const viewportwidth = useViewportResize();
   const boardStyle = {
     width: viewportwidth + 'vw',
     height: 'auto',
@@ -15,14 +17,14 @@ function Board({ children }) {
   const playersData = usePlayerData();
   const [players, setPlayers] = useState([]);
   const [moveableTargets, setMoveableTargets] = useState([]);
-
+  const breakpoint=useBreakpoint();
   useEffect(() => {
     setPlayers(playersData);
   }, [playersData]);
 
   const playersref = useRef([]);
 
-  useEffect(() => {
+  useEffect(() => {  // important as sometimes as movebale renders before refs are assigned so i need to make sure that i render things when refs are assigned
     playersref.current = playersref.current.filter(ref => ref !== null);
     setMoveableTargets(playersref.current);
   }, [players]);
@@ -42,9 +44,9 @@ function Board({ children }) {
         players.map((player, index) => (
           <div key={player.id}>
             <div
-              style={{ top: `${10}%`, zIndex: 10 - index }}
+              style={{ top: `${10 }% `}}
               ref={(element) => playersref.current[index] = element}
-              className="w-1/2 h-1/2 border-solid border-2 border-red-500 absolute top-0 left-0"
+              className="w-1/2 h-1/2 border-solid border-2 border-red-500 absolute top-0 left-0 moveable-target"
             >
               {player.id}
             </div>
@@ -57,7 +59,8 @@ function Board({ children }) {
             key={players[index].id}
             target={target}
             draggable={true}
-            throttleDrag={1}
+            throttleDrag={40}
+            pinchable={true}
             edgeDraggable={false}
             startDragRotate={0}
             throttleDragRotate={0}
@@ -87,3 +90,4 @@ function Board({ children }) {
 }
 
 export default Board;
+    

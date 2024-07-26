@@ -1,3 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+.moveable-target {
+  will-change: transform, width, height;
+}
+/* it will hint the browser and makes it prepare */
