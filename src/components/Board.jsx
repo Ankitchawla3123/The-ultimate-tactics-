@@ -14,16 +14,18 @@ function Board({ children }) {
     aspectRatio: '1.62',
   };
 
-  const playersData = usePlayerData();
+  const playersData = [];
   const [players, setPlayers] = useState([]);
-  const [moveableTargets, setMoveableTargets] = useState([]);
-  const breakpoint=useBreakpoint();
   useEffect(() => {
     setPlayers(playersData);
   }, [playersData]);
 
-  const playersref = useRef([]);
 
+  
+  const [moveableTargets, setMoveableTargets] = useState([]);
+
+  const playersref = useRef([]);
+  
   useEffect(() => {  // important as sometimes as movebale renders before refs are assigned so i need to make sure that i render things when refs are assigned
     playersref.current = playersref.current.filter(ref => ref !== null);
     setMoveableTargets(playersref.current);

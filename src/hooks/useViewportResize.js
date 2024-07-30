@@ -9,7 +9,7 @@ function useViewportResize(){
             setviewport(90)
         }
 
-        else if (breakpoint==='md' && window.innerHeight>window.innerWidth) {
+        else if (breakpoint==='md' && (window.innerHeight>window.innerWidth|| window.innerHeight>window.innerWidth)) {
             setviewport(90)
         }
         else if(breakpoint==='md'){

@@ -12,7 +12,7 @@ function FootballField() {
   return (
     <svg
       width="100%" // Set width to 100% or any fixed value
-      height="auto" // Maintain aspect ratio
+      // height="auto" // Maintain aspect ratio
       viewBox="0 0 1600 900" // Aspect ratio 16:9
       xmlns="http://www.w3.org/2000/svg"
       xmlnsXlink="http://www.w3.org/1999/xlink"
