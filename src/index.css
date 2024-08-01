@@ -5,3 +5,9 @@
   will-change: transform, width, height;
 }
 /* it will hint the browser and makes it prepare */
+
+
+/* removes the middle dot */
+  .moveable-control.moveable-origin {
+    display: none;
+  }

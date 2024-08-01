@@ -1,9 +1,10 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { configureStore } from '@reduxjs/toolkit';
+import boardonePlayerReducer from '../features/players/firstboardPlayersSlice';  // Adjust the path as necessary
 
-import  boardOnePlayersReducer  from "../features/players/firstboardPlayersSlice";
+const store = configureStore({
+  reducer: {
+    board1players: boardonePlayerReducer,
+  },
+});
 
-export const store=configureStore({
-    reducer: {
-        boardOnePlayers:boardOnePlayersReducer,
-    }
-})
+export default store;
