@@ -1,12 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import usePlayerData from '../hooks/usePlayerData.js';
+import { useDispatch, useSelector } from 'react-redux';
+import { addplayers } from '../features/players/firstboardPlayersSlice.js';
+import { nanoid } from '@reduxjs/toolkit';
 import Moveable from "react-moveable";
 import useViewportResize from '../hooks/useViewportResize.js';
-import { useDispatch, useSelector } from 'react-redux';
-import { addplayers, setPlayersRef , removeplayer } from '../features/players/firstboardPlayersSlice.js';
-import { nanoid } from '@reduxjs/toolkit';
-
-
+import PlayerComponent from './PlayerComponent.jsx';
 
 function Board({ children }) {
   const viewportwidth = useViewportResize();
@@ -17,59 +15,40 @@ function Board({ children }) {
     backgroundColor: 'green',
     aspectRatio: '1.62',
   };
-  const dispatch=useDispatch();
+  const dispatch = useDispatch();
   const players = useSelector((state) => state.board1players.players);
-  // const moveableTargets=useSelector((state) => state.board1players.playersref)
   const [moveableTargets, setMoveableTargets] = useState([]);
   const playersref = useRef([]);
-  
 
-  useEffect(() => {  // important as sometimes as movebale renders before refs are assigned so i need to make sure that i render things when refs are assigned
+  useEffect(() => {
     playersref.current = playersref.current.filter(ref => ref !== null);
     setMoveableTargets(playersref.current);
-  }, [players,dispatch]);
+  }, [players]);
 
-
-  const addAplayer= ()=>{
-    dispatch(addplayers({ id: nanoid(), position: 'lb', playernumber: 1 }))
-  }
-
-
-
-  const handlePlayerClick = (id, index) => {
-    // setPlayers(prevPlayers => prevPlayers.filter(player => player.id !== id));
-    useDispatch(removeplayer(id))
-    playersref.current = playersref.current.filter((_, idx) => idx !== index);
-    setMoveableTargets(playersref.current); // Update moveable targets
-    
+  const addAplayer = () => {
+    dispatch(addplayers({ id: nanoid(), position: 'lb', playernumber: 1 }));
   };
 
   return (
-    <>
-    <div style={boardStyle} className="flex justify-center items-center">
-      <div className='w-11/12 h-auto bg-green border-red-50 border-solid border-2'>
-        {children}
-      </div>
-      {
-        players.map((player, index) => (
-          <div key={player.id}>
-            <div
-              style={{ top: `${10 }% `}}
-              ref={(element) => playersref.current[index] = element}
-              className="w-1/2 h-1/2 border-solid border-2 border-red-500 absolute top-0 left-0 moveable-target bg-red-300"
-            >
-              {player.id}
-            </div>
-          </div>
-        ))
-      }
-      {
-        moveableTargets.map((target, index) => (
+    <div className="flex flex-col items-center">
+      <div style={boardStyle} className="flex justify-center items-center">
+        <div className='w-11/12 h-auto bg-green border-red-50 border-solid border-2'>
+          {children}
+        </div>
+        {players.map((player, index) => (
+          <PlayerComponent
+            key={player.id}
+            player={player}
+            index={index}
+            playersref={playersref}
+          />
+        ))}
+        {moveableTargets.map((target, index) => (
           <Moveable
             key={players[index].id}
             target={target}
             draggable={true}
-            throttleDrag={40}
+            throttleDrag={0}
             pinchable={true}
             edgeDraggable={false}
             startDragRotate={0}
@@ -92,14 +71,15 @@ function Board({ children }) {
             onRotate={e => {
               e.target.style.transform = e.drag.transform;
             }}
+            style={{ border: 'none', boxShadow: 'none' }} // Inline style
           />
-        ))
-      }
+        ))}
+      </div>
+      <button onClick={addAplayer} className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">
+        Click me
+      </button>
     </div>
-    <button onClick={addAplayer}> Click me</button>
-    </>
   );
 }
 
 export default Board;
-    

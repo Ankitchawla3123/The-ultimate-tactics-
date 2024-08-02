@@ -6,8 +6,14 @@
 }
 /* it will hint the browser and makes it prepare */
 
+.moveable-control-box {
+  display: none !important;
+}
 
 /* removes the middle dot */
   .moveable-control.moveable-origin {
     display: none;
   }
+  
+
+  
