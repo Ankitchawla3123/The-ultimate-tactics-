@@ -8,6 +8,7 @@ import PlayerComponent from './PlayerComponent.jsx';
 
 function Board({ children }) {
   const viewportwidth = useViewportResize();
+
   const boardStyle = {
     width: viewportwidth + 'vw',
     height: 'auto',
@@ -19,6 +20,7 @@ function Board({ children }) {
   const players = useSelector((state) => state.board1players.players);
   const [moveableTargets, setMoveableTargets] = useState([]);
   const playersref = useRef([]);
+  const boardref=useRef(null)
 
   useEffect(() => {
     playersref.current = playersref.current.filter(ref => ref !== null);
