@@ -6,9 +6,12 @@
 }
 /* it will hint the browser and makes it prepare */
 
+
+/* important lets me enable this feature else it wasn't working  */
 .moveable-control-box {
   display: none !important;
 }
+
 
 /* removes the middle dot */
   .moveable-control.moveable-origin {
