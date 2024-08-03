@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { addplayers } from '../features/players/firstboardPlayersSlice.js';
+import { addplayers , changeplayername } from '../features/players/firstboardPlayersSlice.js';
 import { nanoid } from '@reduxjs/toolkit';
 import Moveable from "react-moveable";
 import useViewportResize from '../hooks/useViewportResize.js';
 import PlayerComponent from './PlayerComponent.jsx';
+import ContextMenu from './ContextMenu.jsx';
 
 function Board({ children }) {
   const viewportwidth = useViewportResize();
@@ -19,21 +20,29 @@ function Board({ children }) {
   const dispatch = useDispatch();
   const players = useSelector((state) => state.board1players.players);
   const [moveableTargets, setMoveableTargets] = useState([]);
+  const [contextMenu, setContextMenu] = useState(false);
   const playersref = useRef([]);
-  const boardref=useRef(null)
+  const boardRef = useRef(null);
+  const contextMenuRef = useRef(null);
+
 
   useEffect(() => {
     playersref.current = playersref.current.filter(ref => ref !== null);
     setMoveableTargets(playersref.current);
   }, [players]);
 
+  
+
   const addAplayer = () => {
     dispatch(addplayers({ id: nanoid(), position: 'lb', playernumber: 1 }));
   };
 
+
+
+
   return (
     <div className="flex flex-col items-center">
-      <div style={boardStyle} className="flex justify-center items-center">
+      <div style={boardStyle} className="flex justify-center items-center" ref={boardRef} onContextMenu={(e)=>e.preventDefault()}>
         <div className='w-11/12 h-auto bg-green border-red-50 border-solid border-2'>
           {children}
         </div>
@@ -43,6 +52,7 @@ function Board({ children }) {
             player={player}
             index={index}
             playersref={playersref}
+          
           />
         ))}
         {moveableTargets.map((target, index) => (
