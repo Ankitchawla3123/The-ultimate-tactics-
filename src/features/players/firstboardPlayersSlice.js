@@ -5,7 +5,7 @@ import ContextMenu from '../../components/ContextMenu';
 const initialState={
     players:[],
     ContextMenuState:false,
-    ContextMenuid:"None"
+    ContextMenusave:{x:0,y:0},
 }
 
 const boardonePlayerSlice=createSlice({
@@ -30,13 +30,13 @@ const boardonePlayerSlice=createSlice({
                 return player
             })
         },
-        setContextMenuId:(state,action)=>   {
-            state.ContextMenuid=action.payload;
-            console.log(state.ContextMenuid)
+        setContextMenuDetails:(state,action)=>   {
+            state.ContextMenusave=action.payload;
+            console.log(state.ContextMenusave)
         }
     }
 })
 
-export const {addplayers,removeplayer, changeplayername,ContextMenuStatechange, setContextMenuId}=boardonePlayerSlice.actions;
+export const {addplayers,removeplayer, changeplayername,ContextMenuStatechange, setContextMenuDetails }=boardonePlayerSlice.actions;
 
 export default boardonePlayerSlice.reducer;

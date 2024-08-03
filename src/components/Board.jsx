@@ -55,6 +55,7 @@ function Board({ children }) {
           
           />
         ))}
+        <ContextMenu/>
         {moveableTargets.map((target, index) => (
           <Moveable
             key={players[index].id}

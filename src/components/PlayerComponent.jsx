@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
-import { ContextMenuStatechange, setContextMenuId} from '../features/players/firstboardPlayersSlice.js';
+import { ContextMenuStatechange, setContextMenuDetails} from '../features/players/firstboardPlayersSlice.js';
 
 function PlayerComponent({ player, index, playersref }) {
   const playerRef = useRef(null);
@@ -34,8 +34,10 @@ function PlayerComponent({ player, index, playersref }) {
   const handleContextMenu = (e) => {
     e.preventDefault(); // Prevent the default context menu
     dispatch(ContextMenuStatechange()); // Dispatch the action to toggle the context menu
-    dispatch(setContextMenuId(player.id))
+    dispatch(setContextMenuDetails({id:player.id,x:e.pageX,y:e.pageY }))
     console.log("new")
+
+
   };
 
   return (
