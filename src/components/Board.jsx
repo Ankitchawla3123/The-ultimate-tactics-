@@ -23,7 +23,9 @@ function Board({ children }) {
   const [contextMenu, setContextMenu] = useState(false);
   const playersref = useRef([]);
   const boardRef = useRef(null);
-  const contextMenuRef = useRef(null);
+
+  
+
 
 
   useEffect(() => {
@@ -55,7 +57,7 @@ function Board({ children }) {
           
           />
         ))}
-        <ContextMenu/>
+        <ContextMenu />
         {moveableTargets.map((target, index) => (
           <Moveable
             key={players[index].id}

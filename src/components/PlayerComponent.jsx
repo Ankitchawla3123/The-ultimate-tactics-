@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
-import { ContextMenuStatechange, setContextMenuDetails} from '../features/players/firstboardPlayersSlice.js';
+import { ContextMenuStatechange, setContextMenuDetails } from '../features/players/firstboardPlayersSlice.js';
 
 function PlayerComponent({ player, index, playersref }) {
   const playerRef = useRef(null);
@@ -33,11 +33,19 @@ function PlayerComponent({ player, index, playersref }) {
 
   const handleContextMenu = (e) => {
     e.preventDefault(); // Prevent the default context menu
-    dispatch(ContextMenuStatechange()); // Dispatch the action to toggle the context menu
-    dispatch(setContextMenuDetails({id:player.id,x:e.pageX,y:e.pageY }))
-    console.log("new")
 
+    if (playerRef.current) {
+      const playerRect = playerRef.current.getBoundingClientRect();
+      const boardRect = playerRef.current.closest('.flex').getBoundingClientRect(); // Assuming the parent board is in a flex container
 
+      // Calculate the position for the context menu
+      const adjustedX = playerRect.left - boardRect.left; // Position relative to board
+      const adjustedY = playerRect.bottom - boardRect.top; // Position right below player
+
+      dispatch(ContextMenuStatechange(true)); // Show the context menu
+      dispatch(setContextMenuDetails({ id: player.id, x: adjustedX, y: adjustedY }));
+      console.log("Context Menu position updated");
+    }
   };
 
   return (
@@ -47,6 +55,9 @@ function PlayerComponent({ player, index, playersref }) {
       ref={playerRef}
       onContextMenu={handleContextMenu} // Handle context menu
     >
+      <div className="w-3/4 p-0 m-0 text-center text-sm">
+        {player.position}
+      </div>
       <svg
         style={svgStyle}
         viewBox="0 0 50 50"
@@ -79,10 +90,7 @@ function PlayerComponent({ player, index, playersref }) {
           cy="25"
         />
       </svg>
-      <div
-       className="w-3/4 h-0 p-0 m-0 text-center text-sm" >
-        {player.position}
-      </div>
+
     </div>
   );
 }
