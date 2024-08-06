@@ -6,8 +6,9 @@ import Moveable from "react-moveable";
 import useViewportResize from '../hooks/useViewportResize.js';
 import PlayerComponent from './PlayerComponent.jsx';
 import ContextMenu from './ContextMenu.jsx';
+import FootballField from './Field.jsx';
 
-function Board({ children }) {
+function Board() {
   const viewportwidth = useViewportResize();
 
   const boardStyle = {
@@ -36,7 +37,7 @@ function Board({ children }) {
   
 
   const addAplayer = () => {
-    dispatch(addplayers({ id: nanoid(), position: 'lb', playernumber: 1 }));
+    dispatch(addplayers({ id: nanoid(),playername:"",playercolor:"#000000", position: 'lb', playernumber: 2 }));
   };
 
 
@@ -46,7 +47,7 @@ function Board({ children }) {
     <div className="flex flex-col items-center">
       <div style={boardStyle} className="flex justify-center items-center" ref={boardRef} onContextMenu={(e)=>e.preventDefault()}>
         <div className='w-11/12 h-auto bg-green border-red-50 border-solid border-2'>
-          {children}
+          <FootballField/>
         </div>
         {players.map((player, index) => (
           <PlayerComponent

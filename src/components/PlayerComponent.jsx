@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import { ContextMenuStatechange, setContextMenuDetails } from '../features/players/firstboardPlayersSlice.js';
+import chroma from 'chroma-js';
 
 function PlayerComponent({ player, index, playersref }) {
   const playerRef = useRef(null);
@@ -10,6 +11,18 @@ function PlayerComponent({ player, index, playersref }) {
     // Update the reference to the player element
     playersref.current[index] = playerRef.current;
   }, [index, playersref]);
+
+  // Determine text color based on the player's color
+  const getTextColor = (color) => {
+    const luminance = chroma(color).luminance();
+    return luminance > 0.5 ? '#000000' : '#ffffff'; // Black for light, white for dark
+  };
+
+  // Generate outer ring color based on inner ring color
+  const getOuterRingColor = (innerColor) => {
+    return chroma(innerColor).darken(1.5).hex(); // Darken the color
+  };
+  
 
   const playerStyle = {
     top: '10%',
@@ -48,6 +61,9 @@ function PlayerComponent({ player, index, playersref }) {
     }
   };
 
+  const textColor = getTextColor(player.playercolor);
+  const outerRingColor = getOuterRingColor(player.playercolor);
+
   return (
     <div
       style={playerStyle}
@@ -56,7 +72,7 @@ function PlayerComponent({ player, index, playersref }) {
       onContextMenu={handleContextMenu} // Handle context menu
     >
       <div className="w-3/4 p-0 m-0 text-center text-sm">
-        {player.position}
+        {player.name}
       </div>
       <svg
         style={svgStyle}
@@ -66,31 +82,31 @@ function PlayerComponent({ player, index, playersref }) {
         <circle
           className="svg-player-shape"
           r="19.3"
-          fill="#333333"
+          fill={player.playercolor}
           cx="25"
           cy="25"
         />
         <text
-          className="svg-player-number"
+          className="svg-player-number  font-bold"
           textAnchor="middle"
-          fontSize="19"
-          fill="#ffffff"
+          fontSize="22"
+          fill={textColor} // Set text color based on background color
           x="25"
           y="27"
           dominantBaseline="middle"
+          
         >
           {player.playernumber}
         </text>
         <circle
           r="19.3"
-          strokeWidth="2"
+          strokeWidth="5"
           fill="none"
-          stroke="#2b2b2b"
+          stroke={outerRingColor} // Set outer ring color based on inner ring color
           cx="25"
           cy="25"
         />
       </svg>
-
     </div>
   );
 }
