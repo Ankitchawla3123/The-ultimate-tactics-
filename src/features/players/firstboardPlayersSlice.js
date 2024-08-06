@@ -18,20 +18,28 @@ const boardonePlayerSlice=createSlice({
         removeplayer:(state,action)=>{
             state=state.players.filter((player)=> player.id!==action.payload)
         },
-        ContextMenuStatechange:(state)=>{
-            state.ContextMenuState=!state.ContextMenuState;
+        ContextMenuStatechange:(state,action)=>{
+            state.ContextMenuState=action.payload;
         
         },
         GetPlayer:(state,action)=>{
             const player = state.players.find(player => player.id === action.payload); 
             return player;
         },
-        changeplayername:(state,action)=>{
+        changeplayernumber:(state,action)=>{
             state.players=state.players.map((player)=>{
-                if(player.id==action.payload){
-                    player.position='rb'
+                if(player.id==action.payload.id){
+                    player.playernumber=action.payload.number
                 }
                 return player
+            })
+        },
+        ChangeColor:(state,action)=>{
+            state.players=state.players.map((player)=>{
+                if(player.id===action.payload.id){
+                    player.playercolor=action.payload.color;
+                }
+                return player 
             })
         },
         setContextMenuDetails:(state,action)=>   {
@@ -51,6 +59,6 @@ const boardonePlayerSlice=createSlice({
     }
 })
 
-export const {addplayers,removeplayer, changeplayername,ContextMenuStatechange, setContextMenuDetails, GetPlayer ,ChangePlayername}=boardonePlayerSlice.actions;
+export const {addplayers,removeplayer, changeplayernumber,ContextMenuStatechange, setContextMenuDetails, GetPlayer ,ChangePlayername, ChangeColor}=boardonePlayerSlice.actions;
 
 export default boardonePlayerSlice.reducer;

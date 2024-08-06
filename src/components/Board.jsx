@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { addplayers , changeplayername } from '../features/players/firstboardPlayersSlice.js';
+import { addplayers, ContextMenuStatechange } from '../features/players/firstboardPlayersSlice.js';
 import { nanoid } from '@reduxjs/toolkit';
 import Moveable from "react-moveable";
 import useViewportResize from '../hooks/useViewportResize.js';
@@ -18,36 +18,42 @@ function Board() {
     backgroundColor: 'green',
     aspectRatio: '1.62',
   };
+
   const dispatch = useDispatch();
   const players = useSelector((state) => state.board1players.players);
   const [moveableTargets, setMoveableTargets] = useState([]);
-  const [contextMenu, setContextMenu] = useState(false);
+  const contextmenu = useSelector((state) => state.board1players.ContextMenuState);
   const playersref = useRef([]);
   const boardRef = useRef(null);
+  const contextMenuRef = useRef(null);
 
-  
-
-
+  useEffect(() => {
+    const ChangeContextMenu = (e) => {
+      if (contextMenuRef.current && contextMenuRef.current.contains(e.target)) {
+        return;
+      }
+      dispatch(ContextMenuStatechange(false));
+    };
+    window.addEventListener("click", ChangeContextMenu);
+    return () => {
+      window.removeEventListener("click", ChangeContextMenu);
+    };
+  }, []);
 
   useEffect(() => {
     playersref.current = playersref.current.filter(ref => ref !== null);
     setMoveableTargets(playersref.current);
   }, [players]);
 
-  
-
   const addAplayer = () => {
-    dispatch(addplayers({ id: nanoid(),playername:"",playercolor:"#000000", position: 'lb', playernumber: 2 }));
+    dispatch(addplayers({ id: nanoid(), playername: "", playercolor: "#000000", position: 'lb', playernumber: 2 }));
   };
-
-
-
 
   return (
     <div className="flex flex-col items-center">
-      <div style={boardStyle} className="flex justify-center items-center" ref={boardRef} onContextMenu={(e)=>e.preventDefault()}>
+      <div style={boardStyle} className="flex justify-center items-center" ref={boardRef} onContextMenu={(e) => e.preventDefault()}>
         <div className='w-11/12 h-auto bg-green border-red-50 border-solid border-2'>
-          <FootballField/>
+          <FootballField />
         </div>
         {players.map((player, index) => (
           <PlayerComponent
@@ -55,10 +61,13 @@ function Board() {
             player={player}
             index={index}
             playersref={playersref}
-          
           />
         ))}
-        <ContextMenu />
+        {contextmenu &&
+          <div ref={contextMenuRef}>
+            <ContextMenu />
+          </div>
+        }
         {moveableTargets.map((target, index) => (
           <Moveable
             key={players[index].id}

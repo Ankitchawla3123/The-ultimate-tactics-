@@ -1,17 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { ChangePlayername } from '../features/players/firstboardPlayersSlice';
+import { ChangePlayername, changeplayernumber, ChangeColor } from '../features/players/firstboardPlayersSlice';
 
 function ContextMenu() {
   const { id, x, y } = useSelector(state => state.board1players.ContextMenusave);
-  const player = useSelector(state => state.board1players.players.find(player => player.id === id)); // Get the player from state
+  const player = useSelector(state => state.board1players.players.find(player => player.id === id));
   const dispatch = useDispatch();
-  
-  const [name, setName] = useState(player ? player.name : '');
+
+  const [name, setName] = useState('');
+  const [number, setNumber] = useState('');
+  const [color, setColor] = useState('#ffffff'); // Default color value
 
   useEffect(() => {
-    // Update local state if player name changes in the Redux store
-    setName(player ? player.name : '');
+    if (player) {
+      setName(player.name || '');
+      setNumber(player.playernumber != null ? String(player.playernumber) : '');
+      setColor(player.playercolor || '#ffffff'); // Ensure default color value
+    }
   }, [player]);
 
   const styling = {
@@ -26,19 +31,46 @@ function ContextMenu() {
     dispatch(ChangePlayername({ id, name: e.target.value }));
   };
 
+  const onNumberChange = (e) => {
+    setNumber(e.target.value);
+    dispatch(changeplayernumber({ id, number: e.target.value }));
+  };
+
+  const onColorChange = (e) => {
+    setColor(e.target.value);
+  };
+
+const changethecolor=(e)=>{
+  e.preventDefault();
+  dispatch(ChangeColor({id:player.id, color:color}));
+}
+
+
   return (
-    <div style={styling} className="">
+    <div style={styling}>
       <input
         type="text"
         placeholder='Player name'
-        value={name || ''} // Ensure the value is never undefined
+        value={name}
         onChange={onNameChange}
       />
       <br />
-      <input type="text" placeholder='Player number' />
+      <input
+        type="number"
+        placeholder='Player number'
+        value={number}
+        onChange={onNumberChange}
+      />
       <br />
-      <input type="color" />
-      <button>Change color</button>
+      <form onSubmit={changethecolor}>
+      <input
+        type="color"
+        value={color}
+        onChange={onColorChange}
+      />
+      <button type='submit'>Change Color</button>
+      </form>
+
     </div>
   );
 }
