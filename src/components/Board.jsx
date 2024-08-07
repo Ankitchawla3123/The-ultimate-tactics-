@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { addplayers, ContextMenuStatechange } from '../features/players/firstboardPlayersSlice.js';
+import { addplayers, ContextMenuStatechange } from '../features/players/firstboardPlayersSlice';
 import { nanoid } from '@reduxjs/toolkit';
 import Moveable from "react-moveable";
-import useViewportResize from '../hooks/useViewportResize.js';
-import PlayerComponent from './PlayerComponent.jsx';
-import ContextMenu from './ContextMenu.jsx';
-import FootballField from './Field.jsx';
+import useViewportResize from '../hooks/useViewportResize';
+import PlayerComponent from './PlayerComponent';
+import ContextMenu from './ContextMenu';
+import FootballField from './Field';
+import DraggablePlayerOptions from './DraggablePlayerOptions';
 
 function Board() {
   const viewportwidth = useViewportResize();
@@ -32,26 +33,55 @@ function Board() {
       if (contextMenuRef.current && contextMenuRef.current.contains(e.target)) {
         return;
       }
+    
       dispatch(ContextMenuStatechange(false));
     };
     window.addEventListener("click", ChangeContextMenu);
     return () => {
       window.removeEventListener("click", ChangeContextMenu);
     };
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     playersref.current = playersref.current.filter(ref => ref !== null);
     setMoveableTargets(playersref.current);
   }, [players]);
 
-  const addAplayer = () => {
-    dispatch(addplayers({ id: nanoid(), playername: "", playercolor: "#000000", position: 'lb', playernumber: 2 }));
+  const handleDragStart = (e, playerOption) => {
+    e.dataTransfer.setData('playerOption', JSON.stringify(playerOption));
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    const playerOption = JSON.parse(e.dataTransfer.getData('playerOption'));
+    const rect = boardRef.current.getBoundingClientRect();
+    console.log(rect)
+    console.log(e.clientX)
+    console.log(e.clientY)
+    const x =e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    dispatch(addplayers({
+      id: nanoid(),
+      playername: "",
+      playercolor: playerOption.color,
+      position: 'lb',
+      playernumber: playerOption.number,
+      x: x,
+      y:y
+    }));
   };
 
   return (
     <div className="flex flex-col items-center">
-      <div style={boardStyle} className="flex justify-center items-center" ref={boardRef} onContextMenu={(e) => e.preventDefault()}>
+      <DraggablePlayerOptions handleDragStart={handleDragStart} />
+      <div
+        style={boardStyle}
+        className="flex justify-center items-center"
+        ref={boardRef}
+        onContextMenu={(e) => e.preventDefault()}
+        onDrop={handleDrop}
+        onDragOver={(e) => e.preventDefault()}
+      >
         <div className='w-11/12 h-auto bg-green border-red-50 border-solid border-2'>
           <FootballField />
         </div>
@@ -87,6 +117,7 @@ function Board() {
             rotationPosition={"top"}
             onDrag={e => {
               e.target.style.transform = e.transform;
+            
             }}
             onResize={e => {
               e.target.style.width = `${e.width}px`;
@@ -100,9 +131,6 @@ function Board() {
           />
         ))}
       </div>
-      <button onClick={addAplayer} className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">
-        Add Player
-      </button>
     </div>
   );
 }

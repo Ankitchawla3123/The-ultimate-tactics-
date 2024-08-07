@@ -25,9 +25,9 @@ function PlayerComponent({ player, index, playersref }) {
   
 
   const playerStyle = {
-    top: '10%',
+    top: player.y,
     position: 'absolute',
-    left: '0%',
+    left: player.x,
     cursor: 'pointer',
     width: '3.55vw',  // Responsive width
     height: '3.55vw', // Responsive height
