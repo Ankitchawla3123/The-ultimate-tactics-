@@ -1,11 +1,27 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { ContextMenuStatechange, setContextMenuDetails } from '../features/players/firstboardPlayersSlice.js';
 import chroma from 'chroma-js';
+import useBreakpoint from '../hooks/useBreakpoint.js';
+import useViewportResize from '../hooks/useViewportResize.js';
+
 
 function PlayerComponent({ player, index, playersref }) {
   const playerRef = useRef(null);
   const dispatch = useDispatch();
+  const breakpoints=useViewportResize();
+  const [WandH, setWandH] = useState({w:3.55, h:3.55})
+  useEffect(()=>{
+    if (breakpoints===90){
+      setWandH({w:5.71,h:5.71})
+    }
+    else if(breakpoints===60){
+      setWandH({w:3.80,h:3.80})
+    }
+    else{
+      setWandH({w:3.55,h:3.55})
+    }
+  },[breakpoints])
 
   useEffect(() => {
     // Update the reference to the player element
@@ -29,8 +45,8 @@ function PlayerComponent({ player, index, playersref }) {
     position: 'absolute',
     left: player.x,
     cursor: 'pointer',
-    width: '3.55vw',  // Responsive width
-    height: '3.55vw', // Responsive height
+    width: `${WandH.w}vw`,  // Responsive width
+    height: `${WandH.w}vw`, // Responsive height
     textAlign: 'center', // Center the text
     margin: 0,
     padding: 0,
