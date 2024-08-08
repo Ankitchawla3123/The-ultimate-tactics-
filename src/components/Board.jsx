@@ -117,6 +117,10 @@ function Board() {
             rotationPosition={"top"}
             onDrag={e => {
               e.target.style.transform = e.transform;
+              if(contextmenu)
+                {dispatch(ContextMenuStatechange(false));
+              }
+
             
             }}
             onResize={e => {
