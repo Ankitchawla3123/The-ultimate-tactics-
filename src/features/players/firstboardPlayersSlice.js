@@ -4,6 +4,18 @@ import ContextMenu from '../../components/ContextMenu';
 
 const initialState={
     players:[],
+    Playeroptions:[
+        { number: 1, color: '#8B0000' }, // Dark Red
+        { number: 1, color: '#FFD700' }, // Gold
+        { number: 1, color: '#8A2BE2' }, // BlueViolet
+        { number: 1, color: '#32CD32' }, // LimeGreen
+        { number: 1, color: '#0000FF' }, // Blue
+        { number: 1, color: '#FF4500' }, // OrangeRed
+        { number: 1, color: '#00CED1' }, // DarkTurquoise
+        { number: 1, color: '#FFFFFF' }, // White
+        { number: 1, color: '#000000' }, // Black
+      ],
+    optionsindex:0,
     ContextMenuState:false,
     ContextMenusave:{id:"",x:0,y:0},
 }
@@ -55,10 +67,16 @@ const boardonePlayerSlice=createSlice({
                 return player
             }    
         )
+        },
+        setOptionsIndex:(state,action)=>{
+            state.optionsindex=action.payload;
+        },
+        addoneinoptions:(state)=>{
+            state.Playeroptions[state.optionsindex].number+=1;
         }
     }
 })
 
-export const {addplayers,removeplayer, changeplayernumber,ContextMenuStatechange, setContextMenuDetails, GetPlayer ,ChangePlayername, ChangeColor}=boardonePlayerSlice.actions;
+export const {addplayers,removeplayer, changeplayernumber,ContextMenuStatechange, setContextMenuDetails, GetPlayer ,ChangePlayername, ChangeColor, setOptionsIndex, addoneinoptions}=boardonePlayerSlice.actions;
 
 export default boardonePlayerSlice.reducer;

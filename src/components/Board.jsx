@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { addplayers, ContextMenuStatechange } from '../features/players/firstboardPlayersSlice';
+import { addoneinoptions, addplayers, ContextMenuStatechange } from '../features/players/firstboardPlayersSlice';
 import { nanoid } from '@reduxjs/toolkit';
 import Moveable from "react-moveable";
 import useViewportResize from '../hooks/useViewportResize';
@@ -47,13 +47,14 @@ function Board() {
     setMoveableTargets(playersref.current);
   }, [players]);
 
-  const handleDragStart = (e, playerOption) => {
-    e.dataTransfer.setData('playerOption', JSON.stringify(playerOption));
-  };
+  const options=useSelector((state)=>state.board1players.Playeroptions)
+  const optionindex=useSelector((state)=>state.board1players.optionsindex)
 
   const handleDrop = (e) => {
     e.preventDefault();
-    const playerOption = JSON.parse(e.dataTransfer.getData('playerOption'));
+
+    const playerOption =options[optionindex] ;
+    console.log(playerOption)
     const rect = boardRef.current.getBoundingClientRect();
     console.log(rect)
     console.log(e.clientX)
@@ -69,11 +70,12 @@ function Board() {
       x: x,
       y:y
     }));
+    dispatch(addoneinoptions())
   };
 
   return (
     <div className="flex flex-col items-center">
-      <DraggablePlayerOptions handleDragStart={handleDragStart} />
+      <DraggablePlayerOptions />
       <div
         style={boardStyle}
         className="flex justify-center items-center"
