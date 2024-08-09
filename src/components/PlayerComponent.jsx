@@ -13,13 +13,13 @@ function PlayerComponent({ player, index, playersref }) {
   const [WandH, setWandH] = useState({w:3.55, h:3.55})
   useEffect(()=>{
     if (breakpoints===90){
-      setWandH({w:5.71,h:5.71})
+      setWandH({w:3.68,h:3.68})
     }
     else if(breakpoints===60){
-      setWandH({w:3.80,h:3.80})
+      setWandH({w:2.46,h:2.46})
     }
     else{
-      setWandH({w:3.55,h:3.55})
+      setWandH({w:2.30,h:2.30})
     }
   },[breakpoints])
 
@@ -56,8 +56,8 @@ function PlayerComponent({ player, index, playersref }) {
     display: 'block',
     margin: 0,
     padding: 0,
-    width: '75%',
-    height: '68%',
+    width: '100%',
+    height: '100%',
   };
 
   const handleContextMenu = (e) => {
@@ -87,8 +87,11 @@ function PlayerComponent({ player, index, playersref }) {
       ref={playerRef}
       onContextMenu={handleContextMenu} // Handle context menu
     >
-      <div className="w-3/4 p-0 m-0 text-center text-sm">
-        {player.name}
+      <div className="w-full p-0 m-0 flex items-center justify-center">
+      <div className="self-center">
+      {player.name}
+      </div>
+        
       </div>
       <svg
         style={svgStyle}

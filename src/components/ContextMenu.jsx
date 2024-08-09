@@ -23,7 +23,7 @@ function ContextMenu() {
     left: x,
     top: y,
     position: "absolute",
-    transform: "translate(0%,10%)",
+    transform: `translate(0%, ${player && player.name ? '30%' : '10%'})`, // Conditional translation
   };
 
   const onNameChange = (e) => {

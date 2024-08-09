@@ -33,7 +33,7 @@ function Board() {
       if (contextMenuRef.current && contextMenuRef.current.contains(e.target)) {
         return;
       }
-    
+
       dispatch(ContextMenuStatechange(false));
     };
     window.addEventListener("click", ChangeContextMenu);
@@ -44,7 +44,7 @@ function Board() {
 
   const handleResize = () => {
     dispatch(updatexy()); // Updates x and y from xy2
-  
+
     // Remove transform property from all moveable targets
     playersref.current.forEach(playerRef => {
       if (playerRef) {
@@ -52,27 +52,27 @@ function Board() {
       }
     });
   };
-  
+
   useEffect(() => {
     window.addEventListener('resize', handleResize);
     handleResize(); // Initial update on mount
-  
+
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-  
+
 
   useEffect(() => {
     playersref.current = playersref.current.filter(ref => ref !== null);
     setMoveableTargets(playersref.current);
   }, [players]);
 
-  const options=useSelector((state)=>state.board1players.Playeroptions)
-  const optionindex=useSelector((state)=>state.board1players.optionsindex)
+  const options = useSelector((state) => state.board1players.Playeroptions)
+  const optionindex = useSelector((state) => state.board1players.optionsindex)
 
   const handleDrop = (e) => {
     e.preventDefault();
 
-    const playerOption =options[optionindex] ;
+    const playerOption = options[optionindex];
     console.log(playerOption)
     const rect = boardRef.current.getBoundingClientRect();
     console.log(rect)
@@ -80,7 +80,7 @@ function Board() {
     console.log(e.clientY)
     const x = ((e.clientX - rect.left) / rect.width) * 100;
     const y = ((e.clientY - rect.top) / rect.height) * 100;
-  
+
     dispatch(addplayers({
       id: nanoid(),
       playername: "",
@@ -88,16 +88,16 @@ function Board() {
       position: 'lb',
       playernumber: playerOption.number,
       x: x,
-      y:y,
-      x2:x,
-      y2:y,
+      y: y,
+      x2: x,
+      y2: y,
     }));
     dispatch(addoneinoptions())
   };
 
   return (
     <div className="flex flex-col ">
-      
+
       <div
         style={boardStyle}
         className="flex justify-center items-center"
@@ -139,23 +139,30 @@ function Board() {
             rotatable={false}
             throttleRotate={0}
             rotationPosition={"top"}
-onDrag={e => {
-  e.target.style.transform = e.transform;
-  if (contextmenu) {
-    dispatch(ContextMenuStatechange(false));
-  }
+            bounds={{"left":0,"top":0,"right":0,"bottom":0,"position":"css"}}
+            snappable={true}
+            
+            onBound={e => {
+                                     console.log(e);
+              }}
+              
+            onDrag={e => {
+              e.target.style.transform = e.transform;
+              if (contextmenu) {
+                dispatch(ContextMenuStatechange(false));
+              }
 
-  const rect = boardRef.current.getBoundingClientRect();
-  const targetRect = e.target.getBoundingClientRect();
-  const x = ((targetRect.left - rect.left) / rect.width) * 100;
-  const y = ((targetRect.top - rect.top) / rect.height) * 100;
-  
-  dispatch(updatexy2({ id: players[index].id, x: x, y: y }));
-}}
-            
-            
-            
-            
+              const rect = boardRef.current.getBoundingClientRect();
+              const targetRect = e.target.getBoundingClientRect();
+              const x = ((targetRect.left - rect.left) / rect.width) * 100;
+              const y = ((targetRect.top - rect.top) / rect.height) * 100;
+
+              dispatch(updatexy2({ id: players[index].id, x: x, y: y }));
+            }}
+
+
+
+
             onResize={e => {
               e.target.style.width = `${e.width}px`;
               e.target.style.height = `${e.height}px`;
@@ -169,9 +176,9 @@ onDrag={e => {
         ))}
       </div>
       <div>
-      <DraggablePlayerOptions />
+        <DraggablePlayerOptions />
       </div>
-      
+
     </div>
   );
 }
