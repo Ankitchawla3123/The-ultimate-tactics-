@@ -12,15 +12,18 @@ const DraggablePlayerOptions = () => {
   const breakpoints = useViewportResize();
   const [WandH, setWandH] = useState({ w: 3.55, h: 3.55 });
 
-  useEffect(() => {
-    if (breakpoints === 90) {
-      setWandH({ w: 5.71-1.8, h: 5.71 });
-    } else if (breakpoints === 60) {
-      setWandH({ w: 3.80-1.2, h: 3.80 });
-    } else {
-      setWandH({ w: 3.55-0.9, h: 3.55 });
+  
+  useEffect(()=>{
+    if (breakpoints===90){
+      setWandH({w:3.68,h:3.68})
     }
-  }, [breakpoints]);
+    else if(breakpoints===60){
+      setWandH({w:2.46,h:2.46})
+    }
+    else{
+      setWandH({w:2.30,h:2.30})
+    }
+  },[breakpoints])
 
   const getTextColor = (color) => {
     const luminance = chroma(color).luminance();
@@ -55,8 +58,8 @@ const DraggablePlayerOptions = () => {
     display: 'block',
     margin: 0,
     padding: 0,
-    width: '75%',
-    height: '68%',
+    width: '100%',
+    height: '100%',
   };
 
   // const handleDragStart(e,option){
