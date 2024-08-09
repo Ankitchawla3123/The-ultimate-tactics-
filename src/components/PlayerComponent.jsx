@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { ContextMenuStatechange, setContextMenuDetails } from '../features/players/firstboardPlayersSlice.js';
 import chroma from 'chroma-js';
-import useBreakpoint from '../hooks/useBreakpoint.js';
+
 import useViewportResize from '../hooks/useViewportResize.js';
 
 
@@ -41,9 +41,9 @@ function PlayerComponent({ player, index, playersref }) {
   
 
   const playerStyle = {
-    top: player.y,
+    top: `${player.y}%`,
     position: 'absolute',
-    left: player.x,
+    left: `${player.x}%`,
     cursor: 'pointer',
     width: `${WandH.w}vw`,  // Responsive width
     height: `${WandH.w}vw`, // Responsive height

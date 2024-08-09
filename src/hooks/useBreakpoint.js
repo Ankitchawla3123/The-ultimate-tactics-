@@ -1,7 +1,10 @@
 import { useEffect, useState  } from "react";
+import { useDispatch } from "react-redux";
+import { updatexy } from "../features/players/firstboardPlayersSlice";
 
 
 function useBreakpoint(){
+    const dispatch=useDispatch()
     const [Breakpoint, setBreakpoint] = useState('');
     const [windowsize, setWindowsize] = useState({
         width: undefined,
@@ -13,6 +16,8 @@ function useBreakpoint(){
             width:window.innerWidth,
             height:window.innerHeight,
         })
+       
+
         // console.log(Breakpoint);
     }
 

@@ -73,10 +73,29 @@ const boardonePlayerSlice=createSlice({
         },
         addoneinoptions:(state)=>{
             state.Playeroptions[state.optionsindex].number+=1;
-        }
+        },
+        updatexy2: (state, action) => {
+            state.players = state.players.map((player) => {
+              if (player.id === action.payload.id) {
+                player.x2 = action.payload.x;
+                player.y2 = action.payload.y;
+              }
+              return player;
+            });
+          },
+          
+          updatexy: (state) => {
+            state.players = state.players.map((player) => {
+              player.x = player.x2;
+              player.y = player.y2;
+              return player;
+            });
+          }
+          
+        
     }
 })
 
-export const {addplayers,removeplayer, changeplayernumber,ContextMenuStatechange, setContextMenuDetails, GetPlayer ,ChangePlayername, ChangeColor, setOptionsIndex, addoneinoptions}=boardonePlayerSlice.actions;
+export const {addplayers,removeplayer, changeplayernumber,ContextMenuStatechange, setContextMenuDetails, GetPlayer ,ChangePlayername, ChangeColor, setOptionsIndex, addoneinoptions, updatexy2, updatexy}=boardonePlayerSlice.actions;
 
 export default boardonePlayerSlice.reducer;

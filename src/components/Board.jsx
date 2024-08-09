@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { addoneinoptions, addplayers, ContextMenuStatechange } from '../features/players/firstboardPlayersSlice';
+import { addoneinoptions, addplayers, ContextMenuStatechange, updatexy, updatexy2 } from '../features/players/firstboardPlayersSlice';
 import { nanoid } from '@reduxjs/toolkit';
 import Moveable from "react-moveable";
 import useViewportResize from '../hooks/useViewportResize';
@@ -42,6 +42,25 @@ function Board() {
     };
   }, [dispatch]);
 
+  const handleResize = () => {
+    dispatch(updatexy()); // Updates x and y from xy2
+  
+    // Remove transform property from all moveable targets
+    playersref.current.forEach(playerRef => {
+      if (playerRef) {
+        playerRef.style.transform = ''; // Clear transform property
+      }
+    });
+  };
+  
+  useEffect(() => {
+    window.addEventListener('resize', handleResize);
+    handleResize(); // Initial update on mount
+  
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  
+
   useEffect(() => {
     playersref.current = playersref.current.filter(ref => ref !== null);
     setMoveableTargets(playersref.current);
@@ -59,8 +78,9 @@ function Board() {
     console.log(rect)
     console.log(e.clientX)
     console.log(e.clientY)
-    const x =e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+  
     dispatch(addplayers({
       id: nanoid(),
       playername: "",
@@ -68,14 +88,16 @@ function Board() {
       position: 'lb',
       playernumber: playerOption.number,
       x: x,
-      y:y
+      y:y,
+      x2:x,
+      y2:y,
     }));
     dispatch(addoneinoptions())
   };
 
   return (
-    <div className="flex flex-col items-center">
-      <DraggablePlayerOptions />
+    <div className="flex flex-col ">
+      
       <div
         style={boardStyle}
         className="flex justify-center items-center"
@@ -117,14 +139,23 @@ function Board() {
             rotatable={false}
             throttleRotate={0}
             rotationPosition={"top"}
-            onDrag={e => {
-              e.target.style.transform = e.transform;
-              if(contextmenu)
-                {dispatch(ContextMenuStatechange(false));
-              }
+onDrag={e => {
+  e.target.style.transform = e.transform;
+  if (contextmenu) {
+    dispatch(ContextMenuStatechange(false));
+  }
 
+  const rect = boardRef.current.getBoundingClientRect();
+  const targetRect = e.target.getBoundingClientRect();
+  const x = ((targetRect.left - rect.left) / rect.width) * 100;
+  const y = ((targetRect.top - rect.top) / rect.height) * 100;
+  
+  dispatch(updatexy2({ id: players[index].id, x: x, y: y }));
+}}
             
-            }}
+            
+            
+            
             onResize={e => {
               e.target.style.width = `${e.width}px`;
               e.target.style.height = `${e.height}px`;
@@ -137,6 +168,10 @@ function Board() {
           />
         ))}
       </div>
+      <div>
+      <DraggablePlayerOptions />
+      </div>
+      
     </div>
   );
 }

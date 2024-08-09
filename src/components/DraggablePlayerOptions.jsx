@@ -14,11 +14,11 @@ const DraggablePlayerOptions = () => {
 
   useEffect(() => {
     if (breakpoints === 90) {
-      setWandH({ w: 5.71, h: 5.71 });
+      setWandH({ w: 5.71-1.8, h: 5.71 });
     } else if (breakpoints === 60) {
-      setWandH({ w: 3.80, h: 3.80 });
+      setWandH({ w: 3.80-1.2, h: 3.80 });
     } else {
-      setWandH({ w: 3.55, h: 3.55 });
+      setWandH({ w: 3.55-0.9, h: 3.55 });
     }
   }, [breakpoints]);
 
@@ -39,11 +39,12 @@ const DraggablePlayerOptions = () => {
     textAlign: 'center', // Center the text
     margin: 0,
     padding: 0,
+    // cursor: 'grab'
     //     display: 'flex',
     //     justifyContent: 'center',
     //     alignItems: 'center',
     //     margin: '0 5px',
-    //     cursor: 'grab',
+        
   };
 
   const handleDragStart=(index)=>{
@@ -64,7 +65,7 @@ const DraggablePlayerOptions = () => {
 
 
   return (
-    <div className="flex justify-center my-4">
+    <div className="flex">
       {playerOptions.map((option, index) => {
         const textColor = getTextColor(option.color);
         const outerRingColor = getOuterRingColor(option.color);
