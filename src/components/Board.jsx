@@ -8,9 +8,12 @@ import PlayerComponent from './PlayerComponent';
 import ContextMenu from './ContextMenu';
 import FootballField from './Field';
 import DraggablePlayerOptions from './DraggablePlayerOptions';
+import useBreakpoint from '../hooks/useBreakpoint';
 
 function Board() {
   const viewportwidth = useViewportResize();
+  const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.pointerEnabled;
+  const breakpoints = useBreakpoint();
 
   const boardStyle = {
     width: viewportwidth + 'vw',
@@ -33,9 +36,10 @@ function Board() {
       if (contextMenuRef.current && contextMenuRef.current.contains(e.target)) {
         return;
       }
-
+     
       dispatch(ContextMenuStatechange(false));
     };
+
     window.addEventListener("click", ChangeContextMenu);
     return () => {
       window.removeEventListener("click", ChangeContextMenu);
@@ -58,26 +62,21 @@ function Board() {
     handleResize(); // Initial update on mount
 
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
+  }, [dispatch]);
 
   useEffect(() => {
     playersref.current = playersref.current.filter(ref => ref !== null);
     setMoveableTargets(playersref.current);
   }, [players]);
 
-  const options = useSelector((state) => state.board1players.Playeroptions)
-  const optionindex = useSelector((state) => state.board1players.optionsindex)
+  const options = useSelector((state) => state.board1players.Playeroptions);
+  const optionindex = useSelector((state) => state.board1players.optionsindex);
 
   const handleDrop = (e) => {
     e.preventDefault();
 
     const playerOption = options[optionindex];
-    console.log(playerOption)
     const rect = boardRef.current.getBoundingClientRect();
-    console.log(rect)
-    console.log(e.clientX)
-    console.log(e.clientY)
     const x = ((e.clientX - rect.left) / rect.width) * 100;
     const y = ((e.clientY - rect.top) / rect.height) * 100;
 
@@ -92,12 +91,11 @@ function Board() {
       x2: x,
       y2: y,
     }));
-    dispatch(addoneinoptions())
+    dispatch(addoneinoptions());
   };
 
   return (
-    <div className="flex flex-col ">
-
+    <div className="flex flex-col">
       <div
         style={boardStyle}
         className="flex justify-center items-center"
@@ -139,13 +137,13 @@ function Board() {
             rotatable={false}
             throttleRotate={0}
             rotationPosition={"top"}
-            bounds={{"left":0,"top":0,"right":0,"bottom":0,"position":"css"}}
+            bounds={{ "left": 0, "top": 0, "right": 0, "bottom": 0, "position": "css" }}
             snappable={true}
-            
+
             onBound={e => {
-                                     console.log(e);
-              }}
-              
+              console.log(e);
+            }}
+
             onDrag={e => {
               e.target.style.transform = e.transform;
               if (contextmenu) {
@@ -160,9 +158,6 @@ function Board() {
               dispatch(updatexy2({ id: players[index].id, x: x, y: y }));
             }}
 
-
-
-
             onResize={e => {
               e.target.style.width = `${e.width}px`;
               e.target.style.height = `${e.height}px`;
@@ -175,10 +170,10 @@ function Board() {
           />
         ))}
       </div>
-      <div>
+      <div className="flex items-center">
         <DraggablePlayerOptions />
-      </div>
 
+      </div>
     </div>
   );
 }

@@ -8,14 +8,11 @@ import './App.css'; // Include your CSS file
 function App() {
   return (
     <div className='flex justify-center'>
-        <Board>
+      <Board>
 
-<FootballField  />
-</Board>
+        <FootballField />
+      </Board>
     </div>
-
-
-
 
   )
 }

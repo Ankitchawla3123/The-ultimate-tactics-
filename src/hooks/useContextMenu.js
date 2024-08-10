@@ -14,7 +14,6 @@ export const useContextMenu = () => {
         const handleClick = () => {
             setClicked(false)
         }
-
         // add listener for user click
         document.addEventListener("click", handleClick)
 
