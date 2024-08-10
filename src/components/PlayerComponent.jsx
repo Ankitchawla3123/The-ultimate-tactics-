@@ -50,6 +50,8 @@ function PlayerComponent({ player, index, playersref }) {
     textAlign: 'center', // Center the text
     margin: 0,
     padding: 0,
+    // transform: "translate(-50%, -50%)"
+
   };
 
   const svgStyle = {

@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addoneinoptions, addplayers, setOptionsIndex } from '../features/players/firstboardPlayersSlice';
 import useBreakpoint from '../hooks/useBreakpoint';
 import { nanoid } from '@reduxjs/toolkit';
+import { getPlayerDimensions } from '../utils/HeightAndWidthofplayer';
 
 
 const DraggablePlayerOptions = () => {
@@ -77,6 +78,25 @@ const DraggablePlayerOptions = () => {
     fontSize: '0.65rem', // Use responsive font size
   };
   const handleaddplayer=()=>{
+    if(highlightedIndex===null) return
+    console.log(breakpoints)
+    const dimensions=getPlayerDimensions(breakpoints2)
+    const viewportWidth = (window.innerWidth);
+    const viewportHeight = (window.innerHeight);
+    const playerWidth = (dimensions.width *viewportWidth )/100  // in viewport width units
+    const playerHeight = (dimensions.height * viewportHeight)/100 // in viewport height units
+    const newviewportw=(viewportWidth* breakpoints2)/100
+    const newviewporth=(viewportHeight* breakpoints2)/100
+
+    
+
+
+    
+    // Calculate the top-left position for the player's center to be at the desired percentage
+    const xPosition = 50 - ((playerWidth/2)/ newviewportw) *100; // Center adjustment for x
+    const yPosition = 50 - ((playerHeight/2) / newviewporth )*100; // Center adjustment for y
+    console.log(xPosition)
+
     dispatch(setOptionsIndex(highlightedIndex));
     dispatch(addplayers({
       id: nanoid(),
@@ -84,10 +104,10 @@ const DraggablePlayerOptions = () => {
       playercolor: playerOptions[highlightedIndex].color,
       position: 'lb',
       playernumber: playerOptions[highlightedIndex].number,
-      x: 50,
-      y: 50,
-      x2: 50,
-      y2: 50,
+      x: xPosition,
+      y: yPosition,
+      x2: xPosition,
+      y2: yPosition,
     }));
     
 

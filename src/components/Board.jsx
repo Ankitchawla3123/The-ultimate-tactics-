@@ -9,6 +9,7 @@ import ContextMenu from './ContextMenu';
 import FootballField from './Field';
 import DraggablePlayerOptions from './DraggablePlayerOptions';
 import useBreakpoint from '../hooks/useBreakpoint';
+import { getPlayerDimensions } from '../utils/HeightAndWidthofplayer';
 
 function Board() {
   const viewportwidth = useViewportResize();
@@ -73,12 +74,21 @@ function Board() {
   const optionindex = useSelector((state) => state.board1players.optionsindex);
 
   const handleDrop = (e) => {
+    
     e.preventDefault();
+    const dimensions=getPlayerDimensions(viewportwidth)
+    const viewportWidth = (window.innerWidth);
+    const viewportHeight = (window.innerHeight);
+    const playerWidth = (dimensions.width *viewportWidth )/100  // in viewport width units
+    const playerHeight = (dimensions.height * viewportHeight)/100 // in viewport height units
+    const newviewportw=(viewportWidth* viewportwidth)/100
+    const newviewporth=(viewportHeight* viewportwidth)/100
+
 
     const playerOption = options[optionindex];
     const rect = boardRef.current.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    const x = ((e.clientX - rect.left) / rect.width) * 100 - ((playerWidth/2)/ newviewportw) *100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100 - ((playerHeight/2)/ newviewporth) *100;
 
     dispatch(addplayers({
       id: nanoid(),
