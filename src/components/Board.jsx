@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addoneinoptions, addplayers, ContextMenuStatechange, updatexy, updatexy2 } from '../features/players/firstboardPlayersSlice';
 import { nanoid } from '@reduxjs/toolkit';
@@ -11,7 +11,7 @@ import DraggablePlayerOptions from './DraggablePlayerOptions';
 import useBreakpoint from '../hooks/useBreakpoint';
 import { getPlayerDimensions } from '../utils/HeightAndWidthofplayer';
 
-function Board() {
+const Board = React.memo(() => {
   const viewportwidth = useViewportResize();
   const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.pointerEnabled;
   const breakpoints = useBreakpoint();
@@ -32,22 +32,23 @@ function Board() {
   const boardRef = useRef(null);
   const contextMenuRef = useRef(null);
 
-  useEffect(() => {
-    const ChangeContextMenu = (e) => {
-      if (contextMenuRef.current && contextMenuRef.current.contains(e.target)) {
-        return;
-      }
-     
-      dispatch(ContextMenuStatechange(false));
-    };
+  // Memoized ChangeContextMenu function
+  const ChangeContextMenu = useCallback((e) => {
+    if (contextMenuRef.current && contextMenuRef.current.contains(e.target)) {
+      return;
+    }
+    dispatch(ContextMenuStatechange(false));
+  }, [dispatch]);
 
+  useEffect(() => {
     window.addEventListener("click", ChangeContextMenu);
     return () => {
       window.removeEventListener("click", ChangeContextMenu);
     };
-  }, [dispatch]);
+  }, [ChangeContextMenu]);
 
-  const handleResize = () => {
+  // Memoized handleResize function
+  const handleResize = useCallback(() => {
     dispatch(updatexy()); // Updates x and y from xy2
 
     // Remove transform property from all moveable targets
@@ -56,14 +57,14 @@ function Board() {
         playerRef.style.transform = ''; // Clear transform property
       }
     });
-  };
+  }, [dispatch]);
 
   useEffect(() => {
     window.addEventListener('resize', handleResize);
     handleResize(); // Initial update on mount
 
     return () => window.removeEventListener('resize', handleResize);
-  }, [dispatch]);
+  }, [handleResize]);
 
   useEffect(() => {
     playersref.current = playersref.current.filter(ref => ref !== null);
@@ -73,22 +74,21 @@ function Board() {
   const options = useSelector((state) => state.board1players.Playeroptions);
   const optionindex = useSelector((state) => state.board1players.optionsindex);
 
-  const handleDrop = (e) => {
-    
+  // Memoized handleDrop function
+  const handleDrop = useCallback((e) => {
     e.preventDefault();
-    const dimensions=getPlayerDimensions(viewportwidth)
-    const viewportWidth = (window.innerWidth);
-    const viewportHeight = (window.innerHeight);
-    const playerWidth = (dimensions.width *viewportWidth )/100  // in viewport width units
-    const playerHeight = (dimensions.height * viewportHeight)/100 // in viewport height units
-    const newviewportw=(viewportWidth* viewportwidth)/100
-    const newviewporth=(viewportHeight* viewportwidth)/100
-
+    const dimensions = getPlayerDimensions(viewportwidth);
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const playerWidth = (dimensions.width * viewportWidth) / 100; // in viewport width units
+    const playerHeight = (dimensions.height * viewportHeight) / 100; // in viewport height units
+    const newviewportw = (viewportWidth * viewportwidth) / 100;
+    const newviewporth = (viewportHeight * viewportwidth) / 100;
 
     const playerOption = options[optionindex];
     const rect = boardRef.current.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100 - ((playerWidth/2)/ newviewportw) *100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100 - ((playerHeight/2)/ newviewporth) *100;
+    const x = ((e.clientX - rect.left) / rect.width) * 100 - ((playerWidth / 2) / newviewportw) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100 - ((playerHeight / 2) / newviewporth) * 100;
 
     dispatch(addplayers({
       id: nanoid(),
@@ -102,7 +102,34 @@ function Board() {
       y2: y,
     }));
     dispatch(addoneinoptions());
-  };
+  }, [dispatch, options, optionindex, viewportwidth]);
+
+  // Memoized onDrag function for Moveable
+  const onDrag = useCallback((e, index) => {
+    e.target.style.transform = e.transform;
+    if (contextmenu) {
+      dispatch(ContextMenuStatechange(false));
+    }
+
+    const rect = boardRef.current.getBoundingClientRect();
+    const targetRect = e.target.getBoundingClientRect();
+    const x = ((targetRect.left - rect.left) / rect.width) * 100;
+    const y = ((targetRect.top - rect.top) / rect.height) * 100;
+
+    dispatch(updatexy2({ id: players[index].id, x: x, y: y }));
+  }, [dispatch, contextmenu, players]);
+
+  // Memoized onResize function for Moveable
+  const onResize = useCallback((e) => {
+    e.target.style.width = `${e.width}px`;
+    e.target.style.height = `${e.height}px`;
+    e.target.style.transform = e.drag.transform;
+  }, []);
+
+  // Memoized onRotate function for Moveable
+  const onRotate = useCallback((e) => {
+    e.target.style.transform = e.drag.transform;
+  }, []);
 
   return (
     <div className="flex flex-col">
@@ -132,7 +159,7 @@ function Board() {
         }
         {moveableTargets.map((target, index) => (
           <Moveable
-            key={players[index].id}
+            key={index}
             target={target}
             draggable={true}
             throttleDrag={0}
@@ -154,38 +181,19 @@ function Board() {
               console.log(e);
             }}
 
-            onDrag={e => {
-              e.target.style.transform = e.transform;
-              if (contextmenu) {
-                dispatch(ContextMenuStatechange(false));
-              }
+            onDrag={e => onDrag(e, index)}
 
-              const rect = boardRef.current.getBoundingClientRect();
-              const targetRect = e.target.getBoundingClientRect();
-              const x = ((targetRect.left - rect.left) / rect.width) * 100;
-              const y = ((targetRect.top - rect.top) / rect.height) * 100;
-
-              dispatch(updatexy2({ id: players[index].id, x: x, y: y }));
-            }}
-
-            onResize={e => {
-              e.target.style.width = `${e.width}px`;
-              e.target.style.height = `${e.height}px`;
-              e.target.style.transform = e.drag.transform;
-            }}
-            onRotate={e => {
-              e.target.style.transform = e.drag.transform;
-            }}
+            onResize={onResize}
+            onRotate={onRotate}
             style={{ border: 'none', boxShadow: 'none' }} // Inline style
           />
         ))}
       </div>
       <div className="flex items-center">
         <DraggablePlayerOptions />
-
       </div>
     </div>
   );
-}
+});
 
 export default Board;

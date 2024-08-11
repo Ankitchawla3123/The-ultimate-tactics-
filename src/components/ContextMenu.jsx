@@ -1,21 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { ChangePlayername, changeplayernumber, ChangeColor } from '../features/players/firstboardPlayersSlice';
+import { ChangePlayername, changeplayernumber, ChangeColor, removeplayer, ContextMenuStatechange } from '../features/players/firstboardPlayersSlice';
 
-function ContextMenu() {
+const ContextMenu = memo(() => {
   const { id, x, y } = useSelector(state => state.board1players.ContextMenusave);
   const player = useSelector(state => state.board1players.players.find(player => player.id === id));
   const dispatch = useDispatch();
 
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
-  const [color, setColor] = useState('#ffffff'); // Default color value
+  const [color, setColor] = useState('#ffffff');
 
   useEffect(() => {
     if (player) {
       setName(player.name || '');
       setNumber(player.playernumber != null ? String(player.playernumber) : '');
-      setColor(player.playercolor || '#ffffff'); // Ensure default color value
+      setColor(player.playercolor || '#ffffff');
     }
   }, [player]);
 
@@ -23,7 +23,7 @@ function ContextMenu() {
     left: x,
     top: y,
     position: "absolute",
-    transform: `translate(0%, ${player && player.name ? '30%' : '10%'})`, // Conditional translation
+    transform: `translate(0%, ${player && player.name ? '30%' : '10%'})`,
   };
 
   const onNameChange = (e) => {
@@ -40,11 +40,15 @@ function ContextMenu() {
     setColor(e.target.value);
   };
 
-const changethecolor=(e)=>{
-  e.preventDefault();
-  dispatch(ChangeColor({id:player.id, color:color}));
-}
+  const changethecolor = (e) => {
+    e.preventDefault();
+    dispatch(ChangeColor({ id: player.id, color: color }));
+  };
 
+  const removeaplayer = () => {
+    dispatch(removeplayer(player.id));
+    dispatch(ContextMenuStatechange(false));
+  };
 
   return (
     <div style={styling}>
@@ -63,16 +67,16 @@ const changethecolor=(e)=>{
       />
       <br />
       <form onSubmit={changethecolor}>
-      <input
-        type="color"
-        value={color}
-        onChange={onColorChange}
-      />
-      <button type='submit'>Change Color</button>
+        <input
+          type="color"
+          value={color}
+          onChange={onColorChange}
+        />
+        <button type='submit'>Change Color</button>
       </form>
-
+      <button onClick={removeaplayer}> Remove Player</button>
     </div>
   );
-}
+});
 
 export default ContextMenu;

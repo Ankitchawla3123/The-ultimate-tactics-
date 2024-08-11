@@ -28,7 +28,7 @@ const boardonePlayerSlice=createSlice({
             state.players.push(action.payload)
         },
         removeplayer:(state,action)=>{
-            state=state.players.filter((player)=> player.id!==action.payload)
+            state.players=state.players.filter((player)=> player.id!==action.payload)
         },
         ContextMenuStatechange:(state,action)=>{
             state.ContextMenuState=action.payload;
