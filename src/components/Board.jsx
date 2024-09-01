@@ -24,6 +24,7 @@ const Board = React.memo(() => {
     aspectRatio: '1.62',
   };
 
+
   const dispatch = useDispatch();
   const players = useSelector((state) => state.board1players.players);
   const [moveableTargets, setMoveableTargets] = useState([]);
@@ -31,6 +32,75 @@ const Board = React.memo(() => {
   const playersref = useRef([]);
   const boardRef = useRef(null);
   const contextMenuRef = useRef(null);
+  const [formation, setFormation] = useState([4,1,2,1,2])
+
+
+  const setformations=()=>{
+
+    const dimensions = getPlayerDimensions(viewportwidth);
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const playerWidth = (dimensions.width * viewportWidth) / 100; // in viewport width units
+    const playerHeight = (dimensions.height * viewportHeight) / 100; // in viewport height units
+    const rect = boardRef.current.getBoundingClientRect();
+    const newviewportw = rect.width;
+    const newviewporth =rect.height;
+    const fieldwidth=(newviewportw)*11/12
+    const fieldheight=(fieldwidth)/1.62
+    const playerdiameter=((playerWidth ) / newviewportw) * 100
+    const playerdiameter2=((playerHeight ) / newviewporth) * 100
+
+    const playerradius=((playerWidth/2 ) / newviewportw) * 100 ;
+    const playerradius2=((playerHeight/2 ) / newviewporth) * 100
+
+    const leftspace=(((newviewportw-fieldwidth)/2)/newviewportw)*100 - ((playerWidth / 2) / newviewportw) * 100;
+    const topspace=(((newviewporth-fieldheight)/2)/newviewporth)*100 + playerradius;
+    const xstart=leftspace + playerradius
+    const xend=100- playerdiameter- xstart
+    const xmid=(xstart+xend)/2
+    
+    const ystart=topspace+playerradius2;
+    const yend=100-topspace-topspace-playerradius;
+    const ymid=(ystart+yend)/2
+
+    const playersposition=[]
+    const formationlength=formation.length;
+    if (formation!=[]) {
+      playersposition.push('1:1')
+      for (let i = 1; i <= formation.length; i++) {
+        for (let j = 0; j < formation[i-1]; j++) {
+          playersposition.push(`${i+1}:${j+1}`)
+        }
+      }
+    }
+    console.log(playersposition)
+    const defencelinestart=xstart+(xmid-xstart)/4.5
+    const division=(xmid-playerradius-defencelinestart)/(formationlength-1)
+    for (let i = 0; i < formationlength; i++) {
+      
+  
+      const ydivision=((yend-ystart)+2*ystart)/(formation[i]+1)
+      for (let j = 1; j <= formation[i]; j++) {
+        dispatch(addplayers({
+          id: nanoid(),
+          playername: "",
+          playercolor: 'red',
+          position: 'lb',
+          playernumber: 3,
+          x: defencelinestart+ i* division,
+          y: j*ydivision,
+          x2:defencelinestart+ i* division,
+          y2: j*ydivision,
+        }));
+        
+      }
+
+    }
+
+
+    // xstart+playerradius = goalkeeper
+    // xstart+(xmid-xstart)/4.5 = defence line start
+  }
 
   // Memoized ChangeContextMenu function
   const ChangeContextMenu = useCallback((e) => {
@@ -83,7 +153,7 @@ const Board = React.memo(() => {
     const playerWidth = (dimensions.width * viewportWidth) / 100; // in viewport width units
     const playerHeight = (dimensions.height * viewportHeight) / 100; // in viewport height units
     const newviewportw = (viewportWidth * viewportwidth) / 100;
-    const newviewporth = (viewportHeight * viewportwidth) / 100;
+    const newviewporth =newviewportw/1.62
 
     const playerOption = options[optionindex];
     const rect = boardRef.current.getBoundingClientRect();
@@ -135,7 +205,7 @@ const Board = React.memo(() => {
     <div className="flex flex-col">
       <div
         style={boardStyle}
-        className="flex justify-center items-center"
+        className="flex justify-center items-center "
         ref={boardRef}
         onContextMenu={(e) => e.preventDefault()}
         onDrop={handleDrop}
@@ -191,6 +261,9 @@ const Board = React.memo(() => {
       </div>
       <div className="flex items-center">
         <DraggablePlayerOptions />
+      </div>
+      <div>
+        <button onClick={setformations} className='w-10'> add check</button>
       </div>
     </div>
   );

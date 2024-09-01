@@ -11,8 +11,7 @@ function FootballField() {
 
   return (
     <svg
-      width="100%" // Set width to 100% or any fixed value
-      // height="auto" // Maintain aspect ratio
+      width="100%" 
       viewBox="0 0 1600 900" // Aspect ratio 16:9
       xmlns="http://www.w3.org/2000/svg"
       xmlnsXlink="http://www.w3.org/1999/xlink"
@@ -37,8 +36,8 @@ function FootballField() {
       <circle cx={1600 - midpointX -28} cy="450" r={penaltySpotRadius} fill="#000" />
 
       {/* Goals */}
-      <rect x="0" y="400" width="50" height="100" fill="none" stroke="#000" strokeWidth="5" />
-      <rect x="1550" y="400" width="50" height="100" fill="none" stroke="#000" strokeWidth="5" />
+      <rect x="0" y="400" width="15" height="100" fill="none" stroke="#000" strokeWidth="5" />
+      <rect x="1585" y="400" width="20" height="100" fill="none" stroke="#000" strokeWidth="5" />
 
       {/* Center line */}
       <line x1="800" y1="0" x2="800" y2="900" stroke="#000" strokeWidth="5" />
