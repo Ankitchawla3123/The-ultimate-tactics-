@@ -51,7 +51,7 @@ const ContextMenu = memo(() => {
   };
 
   return (
-    <div style={styling}>
+    <div style={styling} className=' z-50'>
       <input
         type="text"
         placeholder='Player name'

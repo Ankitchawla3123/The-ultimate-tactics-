@@ -1,4 +1,4 @@
-import {createSlice} from '@reduxjs/toolkit';
+import {createSlice, current} from '@reduxjs/toolkit';
 import { act } from 'react';
 import ContextMenu from '../../components/ContextMenu';
 
@@ -18,6 +18,11 @@ const initialState={
     optionsindex:0,
     ContextMenuState:false,
     ContextMenusave:{id:"",x:0,y:0},
+    isdrawing:false,
+    drawpolystatus: false,
+    drawordragstarted: false,
+    currentmode:'Drag&Resize',
+    drawingtype:'line',
 }
 
 const boardonePlayerSlice=createSlice({
@@ -90,12 +95,25 @@ const boardonePlayerSlice=createSlice({
               player.y = player.y2;
               return player;
             });
+          },
+          setidrawing: (state, action)=>{
+            state.isdrawing=action.payload;
+          },
+          setdrawpolystatus: (state,action)=>{
+            state.drawpolystatus=action.payload;
+          },
+          setdrawingstarted: (state,action)=>{
+            state.drawordragstarted=action.payload;
+          },
+          setcurrentmode : (state,action)=>{
+            state.currentmode=action.payload
+          },
+          setdrawingtype : (state,action)=>{
+            state.drawingtype=action.payload
           }
-          
-        
     }
 })
 
-export const {addplayers,removeplayer, changeplayernumber,ContextMenuStatechange, setContextMenuDetails, GetPlayer ,ChangePlayername, ChangeColor, setOptionsIndex, addoneinoptions, updatexy2, updatexy}=boardonePlayerSlice.actions;
+export const {addplayers,removeplayer, changeplayernumber,ContextMenuStatechange, setContextMenuDetails, GetPlayer ,ChangePlayername, ChangeColor, setOptionsIndex, addoneinoptions, updatexy2, updatexy, setidrawing, setdrawpolystatus, setdrawingstarted, setcurrentmode, setdrawingtype}=boardonePlayerSlice.actions;
 
 export default boardonePlayerSlice.reducer;

@@ -1,14 +1,15 @@
 import React, { useEffect, useRef, useState, useCallback, memo } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { ContextMenuStatechange, setContextMenuDetails } from '../features/players/firstboardPlayersSlice.js';
 import chroma from 'chroma-js';
 import useViewportResize from '../hooks/useViewportResize.js';
 
-const PlayerComponent = memo(({ player, index, playersref }) => {
+const PlayerComponent = memo(({ player, index, playersref, onMouseEnter, onMouseLeave, onTouchStart, onTouchEnd, zIndex , onMouseMove}) => {
   const playerRef = useRef(null);
   const dispatch = useDispatch();
   const breakpoints = useViewportResize();
   const [WandH, setWandH] = useState({ w: 3.55, h: 3.55 });
+  const drawdragcheck=useSelector((state)=> state.board1players.drawordragstarted)
 
   useEffect(() => {
     if (breakpoints === 90) {
@@ -37,13 +38,15 @@ const PlayerComponent = memo(({ player, index, playersref }) => {
     top: `${player.y}%`,
     position: 'absolute',
     left: `${player.x}%`,
-    cursor: 'pointer',
     width: `${WandH.w}vw`,
-    height: `${WandH.w}vw`,
+    height: `${WandH.h}vw`,
     textAlign: 'center',
     margin: 0,
     padding: 0,
-  };
+    // **Apply zIndex here**
+    zIndex,
+    pointerEvents: `${drawdragcheck?'none':'auto'}`
+   };
 
   const svgStyle = {
     display: 'block',
@@ -110,6 +113,12 @@ const PlayerComponent = memo(({ player, index, playersref }) => {
       className="moveable-target"
       ref={playerRef}
       onContextMenu={handleContextMenu}
+      // **Add touch event handlers here**
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
+      // onMouseEnter={onMouseEnter}
+      // onMouseLeave={onMouseLeave}
+      // onMouseMove={onMouseMove}
     >
       <div className="w-full p-0 m-0 flex items-center justify-center">
         <div className="self-center">

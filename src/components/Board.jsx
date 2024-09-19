@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Button } from "@/components/ui/button"
+
 import { useDispatch, useSelector } from 'react-redux';
-import { addoneinoptions, addplayers, ContextMenuStatechange, updatexy, updatexy2 } from '../features/players/firstboardPlayersSlice';
+import { addoneinoptions, addplayers, ContextMenuStatechange, setdrawpolystatus, setidrawing, updatexy, updatexy2 } from '../features/players/firstboardPlayersSlice';
 import { nanoid } from '@reduxjs/toolkit';
 import Moveable from "react-moveable";
 import useViewportResize from '../hooks/useViewportResize';
@@ -10,6 +12,12 @@ import FootballField from './Field';
 import DraggablePlayerOptions from './DraggablePlayerOptions';
 import useBreakpoint from '../hooks/useBreakpoint';
 import { getPlayerDimensions } from '../utils/HeightAndWidthofplayer';
+import Drawingboard from './drawingboard/Drawingboard';
+import { Menu } from 'lucide-react';
+import DropMenu from './dropdownmenu/DropMenu';
+import FullMenu from './dropdownmenu/FullMenu';
+
+
 
 const Board = React.memo(() => {
   const viewportwidth = useViewportResize();
@@ -32,10 +40,12 @@ const Board = React.memo(() => {
   const playersref = useRef([]);
   const boardRef = useRef(null);
   const contextMenuRef = useRef(null);
-  const [formation, setFormation] = useState([4,1,2,1,2])
+  const [formation, setFormation] = useState([4, 1, 2, 1, 2])
+  const currentmode = useSelector((state) => state.board1players.currentmode);
 
 
-  const setformations=()=>{
+
+  const setformations = () => {
 
     const dimensions = getPlayerDimensions(viewportwidth);
     const viewportWidth = window.innerWidth;
@@ -44,42 +54,40 @@ const Board = React.memo(() => {
     const playerHeight = (dimensions.height * viewportHeight) / 100; // in viewport height units
     const rect = boardRef.current.getBoundingClientRect();
     const newviewportw = rect.width;
-    const newviewporth =rect.height;
-    const fieldwidth=(newviewportw)*11/12
-    const fieldheight=(fieldwidth)/1.62
-    const playerdiameter=((playerWidth ) / newviewportw) * 100
-    const playerdiameter2=((playerHeight ) / newviewporth) * 100
+    const newviewporth = rect.height;
+    const fieldwidth = (newviewportw) * 11 / 12
+    const fieldheight = (fieldwidth) / 1.62
+    const playerdiameter = ((playerWidth) / newviewportw) * 100
+    const playerdiameter2 = ((playerHeight) / newviewporth) * 100
 
-    const playerradius=((playerWidth/2 ) / newviewportw) * 100 ;
-    const playerradius2=((playerHeight/2 ) / newviewporth) * 100
+    const playerradius = ((playerWidth / 2) / newviewportw) * 100;
+    const playerradius2 = ((playerHeight / 2) / newviewporth) * 100
 
-    const leftspace=(((newviewportw-fieldwidth)/2)/newviewportw)*100 - ((playerWidth / 2) / newviewportw) * 100;
-    const topspace=(((newviewporth-fieldheight)/2)/newviewporth)*100 + playerradius;
-    const xstart=leftspace + playerradius
-    const xend=100- playerdiameter- xstart
-    const xmid=(xstart+xend)/2
-    
-    const ystart=topspace+playerradius2;
-    const yend=100-topspace-topspace-playerradius;
-    const ymid=(ystart+yend)/2
+    const leftspace = (((newviewportw - fieldwidth) / 2) / newviewportw) * 100 - ((playerWidth / 2) / newviewportw) * 100;
+    const topspace = (((newviewporth - fieldheight) / 2) / newviewporth) * 100 + playerradius;
+    const xstart = leftspace + playerradius
+    const xend = 100 - playerdiameter - xstart
+    const xmid = (xstart + xend) / 2
 
-    const playersposition=[]
-    const formationlength=formation.length;
-    if (formation!=[]) {
+    const ystart = topspace + playerradius2;
+    const yend = 100 - topspace - topspace - playerradius;
+    const ymid = (ystart + yend) / 2
+
+    const playersposition = []
+    const formationlength = formation.length;
+    if (formation != []) {
       playersposition.push('1:1')
       for (let i = 1; i <= formation.length; i++) {
-        for (let j = 0; j < formation[i-1]; j++) {
-          playersposition.push(`${i+1}:${j+1}`)
+        for (let j = 0; j < formation[i - 1]; j++) {
+          playersposition.push(`${i + 1}:${j + 1}`)
         }
       }
     }
     console.log(playersposition)
-    const defencelinestart=xstart+(xmid-xstart)/4.5
-    const division=(xmid-playerradius-defencelinestart)/(formationlength-1)
+    const defencelinestart = xstart + (xmid - xstart) / 4.5
+    const division = (xmid - playerradius - defencelinestart) / (formationlength - 1)
     for (let i = 0; i < formationlength; i++) {
-      
-  
-      const ydivision=((yend-ystart)+2*ystart)/(formation[i]+1)
+      const ydivision = ((yend - ystart) + 2 * ystart) / (formation[i] + 1)
       for (let j = 1; j <= formation[i]; j++) {
         dispatch(addplayers({
           id: nanoid(),
@@ -87,12 +95,12 @@ const Board = React.memo(() => {
           playercolor: 'red',
           position: 'lb',
           playernumber: 3,
-          x: defencelinestart+ i* division,
-          y: j*ydivision,
-          x2:defencelinestart+ i* division,
-          y2: j*ydivision,
+          x: defencelinestart + i * division,
+          y: j * ydivision,
+          x2: defencelinestart + i * division,
+          y2: j * ydivision,
         }));
-        
+
       }
 
     }
@@ -100,6 +108,9 @@ const Board = React.memo(() => {
 
     // xstart+playerradius = goalkeeper
     // xstart+(xmid-xstart)/4.5 = defence line start
+
+
+
   }
 
   // Memoized ChangeContextMenu function
@@ -153,7 +164,7 @@ const Board = React.memo(() => {
     const playerWidth = (dimensions.width * viewportWidth) / 100; // in viewport width units
     const playerHeight = (dimensions.height * viewportHeight) / 100; // in viewport height units
     const newviewportw = (viewportWidth * viewportwidth) / 100;
-    const newviewporth =newviewportw/1.62
+    const newviewporth = newviewportw / 1.62
 
     const playerOption = options[optionindex];
     const rect = boardRef.current.getBoundingClientRect();
@@ -201,18 +212,42 @@ const Board = React.memo(() => {
     e.target.style.transform = e.drag.transform;
   }, []);
 
+
+  const drawingstatus = () => {
+    dispatch(setidrawing(true))
+    // setIsdrawing(true)
+  }
+  const drawpolygonstatus = (e) => {
+    dispatch(setdrawpolystatus(true))
+  }
+  const [hoveredIndex, setHoveredIndex] = useState(null);
+  const [touchedIndex, setTouchedIndex] = useState(null);
+
+  // **Handle hover events**
+  const handleMouseEnter = (index) => {
+    setHoveredIndex(index);
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredIndex(null);
+  };
+
+
   return (
     <div className="flex flex-col">
       <div
         style={boardStyle}
-        className="flex justify-center items-center "
+        className="flex justify-center items-center"
         ref={boardRef}
         onContextMenu={(e) => e.preventDefault()}
         onDrop={handleDrop}
         onDragOver={(e) => e.preventDefault()}
       >
-        <div className='w-11/12 h-auto bg-green border-red-50 border-solid border-2'>
+        <div className=' relative w-11/12 h-auto bg-green border-red-50 border-solid border-2 z-10'>
           <FootballField />
+        </div>
+        <div className='absolute '>
+          <Drawingboard />
         </div>
         {players.map((player, index) => (
           <PlayerComponent
@@ -220,6 +255,15 @@ const Board = React.memo(() => {
             player={player}
             index={index}
             playersref={playersref}
+            onMouseMove={() => handleMouseEnter(index)}
+            onMouseEnter={() => handleMouseEnter(index)}
+            onMouseLeave={handleMouseLeave}
+            onTouchStart={() => handleMouseEnter(index)}
+            onTouchEnd={handleMouseLeave}
+            zIndex={
+              touchedIndex === index || hoveredIndex === index ? 10 : 20
+            }
+
           />
         ))}
         {contextmenu &&
@@ -259,12 +303,12 @@ const Board = React.memo(() => {
           />
         ))}
       </div>
-      <div className="flex items-center">
-        <DraggablePlayerOptions />
-      </div>
-      <div>
-        <button onClick={setformations} className='w-10'> add check</button>
-      </div>
+    
+        
+        <div className='flex items-center mt-0.5'>
+          <FullMenu/>
+        </div>
+
     </div>
   );
 });
