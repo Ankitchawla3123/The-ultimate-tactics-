@@ -361,7 +361,6 @@ const Drawingboard = () => {
   //   }
 
   // },[dragline,isDragging])
-
   useEffect(() => {
     let string = "";
     for (let i = 0; i < polypoints.length; i++) {
@@ -383,12 +382,14 @@ const Drawingboard = () => {
   };
 
   const drawlines = (e) => {
-    if (isdrawing && drawlinestatus) {
-      if (drawstart != null && !drawdragcheck) {
-        dispatch(setdrawingstarted(true));
+    if (!drawpolystatus) {
+      if (isdrawing && drawlinestatus) {
+        if (drawstart != null && !drawdragcheck) {
+          dispatch(setdrawingstarted(true));
+        }
+        const { x, y } = getPointerPosition(e);
+        setLine({ x1: drawstart.x, y1: drawstart.y, x2: x, y2: y });
       }
-      const { x, y } = getPointerPosition(e);
-      setLine({ x1: drawstart.x, y1: drawstart.y, x2: x, y2: y });
     }
   };
   const drawingstatus = () => {
