@@ -1,52 +1,59 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Button } from "@/components/ui/button"
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { Button } from "@/components/ui/button";
 
-import { useDispatch, useSelector } from 'react-redux';
-import { addoneinoptions, addplayers, ContextMenuStatechange, setdrawpolystatus, setidrawing, updatexy, updatexy2 } from '../features/players/firstboardPlayersSlice';
-import { nanoid } from '@reduxjs/toolkit';
+import { useDispatch, useSelector } from "react-redux";
+import {
+  addoneinoptions,
+  addplayers,
+  ContextMenuStatechange,
+  setdrawpolystatus,
+  setidrawing,
+  updatexy,
+  updatexy2,
+} from "../features/players/firstboardPlayersSlice";
+import { nanoid } from "@reduxjs/toolkit";
 import Moveable from "react-moveable";
-import useViewportResize from '../hooks/useViewportResize';
-import PlayerComponent from './PlayerComponent';
-import ContextMenu from './ContextMenu';
-import FootballField from './Field';
-import DraggablePlayerOptions from './DraggablePlayerOptions';
-import useBreakpoint from '../hooks/useBreakpoint';
-import { getPlayerDimensions } from '../utils/HeightAndWidthofplayer';
-import Drawingboard from './drawingboard/Drawingboard';
-import { Menu } from 'lucide-react';
-import DropMenu from './dropdownmenu/DropMenu';
-import FullMenu from './dropdownmenu/FullMenu';
-
-
+import useViewportResize from "../hooks/useViewportResize";
+import PlayerComponent from "./PlayerComponent";
+import ContextMenu from "./ContextMenu";
+import FootballField from "./Field";
+import DraggablePlayerOptions from "./DraggablePlayerOptions";
+import useBreakpoint from "../hooks/useBreakpoint";
+import { getPlayerDimensions } from "../utils/HeightAndWidthofplayer";
+import Drawingboard from "./drawingboard/Drawingboard";
+import { Menu } from "lucide-react";
+import DropMenu from "./dropdownmenu/DropMenu";
+import FullMenu from "./dropdownmenu/FullMenu";
 
 const Board = React.memo(() => {
   const viewportwidth = useViewportResize();
-  const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.pointerEnabled;
+  const isTouchDevice =
+    "ontouchstart" in window ||
+    navigator.maxTouchPoints > 0 ||
+    navigator.pointerEnabled;
   const breakpoints = useBreakpoint();
 
   const boardStyle = {
-    width: viewportwidth + 'vw',
-    height: 'auto',
-    position: 'relative',
-    backgroundColor: 'green',
-    aspectRatio: '1.62',
+    width: viewportwidth + "vw",
+    height: "auto",
+    position: "relative",
+    backgroundColor: "green",
+    aspectRatio: "1.62",
   };
-
 
   const dispatch = useDispatch();
   const players = useSelector((state) => state.board1players.players);
   const [moveableTargets, setMoveableTargets] = useState([]);
-  const contextmenu = useSelector((state) => state.board1players.ContextMenuState);
+  const contextmenu = useSelector(
+    (state) => state.board1players.ContextMenuState
+  );
   const playersref = useRef([]);
   const boardRef = useRef(null);
   const contextMenuRef = useRef(null);
-  const [formation, setFormation] = useState([4, 1, 2, 1, 2])
+  const [formation, setFormation] = useState([4, 1, 2, 1, 2]);
   const currentmode = useSelector((state) => state.board1players.currentmode);
 
-
-
   const setformations = () => {
-
     const dimensions = getPlayerDimensions(viewportwidth);
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
@@ -55,71 +62,74 @@ const Board = React.memo(() => {
     const rect = boardRef.current.getBoundingClientRect();
     const newviewportw = rect.width;
     const newviewporth = rect.height;
-    const fieldwidth = (newviewportw) * 11 / 12
-    const fieldheight = (fieldwidth) / 1.62
-    const playerdiameter = ((playerWidth) / newviewportw) * 100
-    const playerdiameter2 = ((playerHeight) / newviewporth) * 100
+    const fieldwidth = (newviewportw * 11) / 12;
+    const fieldheight = fieldwidth / 1.62;
+    const playerdiameter = (playerWidth / newviewportw) * 100;
+    const playerdiameter2 = (playerHeight / newviewporth) * 100;
 
-    const playerradius = ((playerWidth / 2) / newviewportw) * 100;
-    const playerradius2 = ((playerHeight / 2) / newviewporth) * 100
+    const playerradius = (playerWidth / 2 / newviewportw) * 100;
+    const playerradius2 = (playerHeight / 2 / newviewporth) * 100;
 
-    const leftspace = (((newviewportw - fieldwidth) / 2) / newviewportw) * 100 - ((playerWidth / 2) / newviewportw) * 100;
-    const topspace = (((newviewporth - fieldheight) / 2) / newviewporth) * 100 + playerradius;
-    const xstart = leftspace + playerradius
-    const xend = 100 - playerdiameter - xstart
-    const xmid = (xstart + xend) / 2
+    const leftspace =
+      ((newviewportw - fieldwidth) / 2 / newviewportw) * 100 -
+      (playerWidth / 2 / newviewportw) * 100;
+    const topspace =
+      ((newviewporth - fieldheight) / 2 / newviewporth) * 100 + playerradius;
+    const xstart = leftspace + playerradius;
+    const xend = 100 - playerdiameter - xstart;
+    const xmid = (xstart + xend) / 2;
 
     const ystart = topspace + playerradius2;
     const yend = 100 - topspace - topspace - playerradius;
-    const ymid = (ystart + yend) / 2
+    const ymid = (ystart + yend) / 2;
 
-    const playersposition = []
+    const playersposition = [];
     const formationlength = formation.length;
     if (formation != []) {
-      playersposition.push('1:1')
+      playersposition.push("1:1");
       for (let i = 1; i <= formation.length; i++) {
         for (let j = 0; j < formation[i - 1]; j++) {
-          playersposition.push(`${i + 1}:${j + 1}`)
+          playersposition.push(`${i + 1}:${j + 1}`);
         }
       }
     }
-    console.log(playersposition)
-    const defencelinestart = xstart + (xmid - xstart) / 4.5
-    const division = (xmid - playerradius - defencelinestart) / (formationlength - 1)
+    console.log(playersposition);
+    const defencelinestart = xstart + (xmid - xstart) / 4.5;
+    const division =
+      (xmid - playerradius - defencelinestart) / (formationlength - 1);
     for (let i = 0; i < formationlength; i++) {
-      const ydivision = ((yend - ystart) + 2 * ystart) / (formation[i] + 1)
+      const ydivision = (yend - ystart + 2 * ystart) / (formation[i] + 1);
       for (let j = 1; j <= formation[i]; j++) {
-        dispatch(addplayers({
-          id: nanoid(),
-          playername: "",
-          playercolor: 'red',
-          position: 'lb',
-          playernumber: 3,
-          x: defencelinestart + i * division,
-          y: j * ydivision,
-          x2: defencelinestart + i * division,
-          y2: j * ydivision,
-        }));
-
+        dispatch(
+          addplayers({
+            id: nanoid(),
+            playername: "",
+            playercolor: "red",
+            position: "lb",
+            playernumber: 3,
+            x: defencelinestart + i * division,
+            y: j * ydivision,
+            x2: defencelinestart + i * division,
+            y2: j * ydivision,
+          })
+        );
       }
-
     }
-
 
     // xstart+playerradius = goalkeeper
     // xstart+(xmid-xstart)/4.5 = defence line start
-
-
-
-  }
+  };
 
   // Memoized ChangeContextMenu function
-  const ChangeContextMenu = useCallback((e) => {
-    if (contextMenuRef.current && contextMenuRef.current.contains(e.target)) {
-      return;
-    }
-    dispatch(ContextMenuStatechange(false));
-  }, [dispatch]);
+  const ChangeContextMenu = useCallback(
+    (e) => {
+      if (contextMenuRef.current && contextMenuRef.current.contains(e.target)) {
+        return;
+      }
+      dispatch(ContextMenuStatechange(false));
+    },
+    [dispatch]
+  );
 
   useEffect(() => {
     window.addEventListener("click", ChangeContextMenu);
@@ -130,25 +140,25 @@ const Board = React.memo(() => {
 
   // Memoized handleResize function
   const handleResize = useCallback(() => {
-    dispatch(updatexy()); // Updates x and y from xy2
+    // dispatch(updatexy()); // Updates x and y from xy2
 
     // Remove transform property from all moveable targets
-    playersref.current.forEach(playerRef => {
+    playersref.current.forEach((playerRef) => {
       if (playerRef) {
-        playerRef.style.transform = ''; // Clear transform property
+        playerRef.style.transform = ""; // Clear transform property
       }
     });
   }, [dispatch]);
 
   useEffect(() => {
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
     handleResize(); // Initial update on mount
 
-    return () => window.removeEventListener('resize', handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, [handleResize]);
 
   useEffect(() => {
-    playersref.current = playersref.current.filter(ref => ref !== null);
+    playersref.current = playersref.current.filter((ref) => ref !== null);
     setMoveableTargets(playersref.current);
   }, [players]);
 
@@ -156,49 +166,61 @@ const Board = React.memo(() => {
   const optionindex = useSelector((state) => state.board1players.optionsindex);
 
   // Memoized handleDrop function
-  const handleDrop = useCallback((e) => {
-    e.preventDefault();
-    const dimensions = getPlayerDimensions(viewportwidth);
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
-    const playerWidth = (dimensions.width * viewportWidth) / 100; // in viewport width units
-    const playerHeight = (dimensions.height * viewportHeight) / 100; // in viewport height units
-    const newviewportw = (viewportWidth * viewportwidth) / 100;
-    const newviewporth = newviewportw / 1.62
+  const handleDrop = useCallback(
+    (e) => {
+      e.preventDefault();
+      const dimensions = getPlayerDimensions(viewportwidth);
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      const playerWidth = (dimensions.width * viewportWidth) / 100; // in viewport width units
+      const playerHeight = (dimensions.height * viewportHeight) / 100; // in viewport height units
+      const newviewportw = (viewportWidth * viewportwidth) / 100;
+      const newviewporth = newviewportw / 1.62;
 
-    const playerOption = options[optionindex];
-    const rect = boardRef.current.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100 - ((playerWidth / 2) / newviewportw) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100 - ((playerHeight / 2) / newviewporth) * 100;
+      const playerOption = options[optionindex];
+      const rect = boardRef.current.getBoundingClientRect();
+      const x =
+        ((e.clientX - rect.left) / rect.width) * 100 -
+        (playerWidth / 2 / newviewportw) * 100;
+      const y =
+        ((e.clientY - rect.top) / rect.height) * 100 -
+        (playerHeight / 2 / newviewporth) * 100;
 
-    dispatch(addplayers({
-      id: nanoid(),
-      playername: "",
-      playercolor: playerOption.color,
-      position: 'lb',
-      playernumber: playerOption.number,
-      x: x,
-      y: y,
-      x2: x,
-      y2: y,
-    }));
-    dispatch(addoneinoptions());
-  }, [dispatch, options, optionindex, viewportwidth]);
+      dispatch(
+        addplayers({
+          id: nanoid(),
+          playername: "",
+          playercolor: playerOption.color,
+          position: "lb",
+          playernumber: playerOption.number,
+          x: x,
+          y: y,
+          x2: x,
+          y2: y,
+        })
+      );
+      dispatch(addoneinoptions());
+    },
+    [dispatch, options, optionindex, viewportwidth]
+  );
 
   // Memoized onDrag function for Moveable
-  const onDrag = useCallback((e, index) => {
-    e.target.style.transform = e.transform;
-    if (contextmenu) {
-      dispatch(ContextMenuStatechange(false));
-    }
+  const onDrag = useCallback(
+    (e, index) => {
+      e.target.style.transform = e.transform;
+      if (contextmenu) {
+        dispatch(ContextMenuStatechange(false));
+      }
 
-    const rect = boardRef.current.getBoundingClientRect();
-    const targetRect = e.target.getBoundingClientRect();
-    const x = ((targetRect.left - rect.left) / rect.width) * 100;
-    const y = ((targetRect.top - rect.top) / rect.height) * 100;
+      const rect = boardRef.current.getBoundingClientRect();
+      const targetRect = e.target.getBoundingClientRect();
+      const x = ((targetRect.left - rect.left) / rect.width) * 100;
+      const y = ((targetRect.top - rect.top) / rect.height) * 100;
 
-    dispatch(updatexy2({ id: players[index].id, x: x, y: y }));
-  }, [dispatch, contextmenu, players]);
+      // dispatch(updatexy2({ id: players[index].id, x: x, y: y }));
+    },
+    [dispatch, contextmenu, players]
+  );
 
   // Memoized onResize function for Moveable
   const onResize = useCallback((e) => {
@@ -212,14 +234,13 @@ const Board = React.memo(() => {
     e.target.style.transform = e.drag.transform;
   }, []);
 
-
   const drawingstatus = () => {
-    dispatch(setidrawing(true))
+    dispatch(setidrawing(true));
     // setIsdrawing(true)
-  }
+  };
   const drawpolygonstatus = (e) => {
-    dispatch(setdrawpolystatus(true))
-  }
+    dispatch(setdrawpolystatus(true));
+  };
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const [touchedIndex, setTouchedIndex] = useState(null);
 
@@ -232,7 +253,6 @@ const Board = React.memo(() => {
     setHoveredIndex(null);
   };
 
-
   return (
     <div className="flex flex-col">
       <div
@@ -240,16 +260,16 @@ const Board = React.memo(() => {
         className="flex justify-center items-center"
         ref={boardRef}
         onContextMenu={(e) => e.preventDefault()}
-        onDrop={handleDrop}
+        // onDrop={handleDrop}
         onDragOver={(e) => e.preventDefault()}
       >
-        <div className=' relative w-11/12 h-auto bg-green border-red-50 border-solid border-2 z-10'>
+        <div className=" relative w-11/12 h-auto bg-green border-red-50 border-solid border-2 z-10">
           <FootballField />
         </div>
-        <div className='absolute '>
+        <div className="absolute ">
           <Drawingboard />
         </div>
-        {players.map((player, index) => (
+        {/* {players.map((player, index) => (
           <PlayerComponent
             key={player.id}
             player={player}
@@ -260,17 +280,14 @@ const Board = React.memo(() => {
             onMouseLeave={handleMouseLeave}
             onTouchStart={() => handleMouseEnter(index)}
             onTouchEnd={handleMouseLeave}
-            zIndex={
-              touchedIndex === index || hoveredIndex === index ? 10 : 20
-            }
-
+            zIndex={touchedIndex === index || hoveredIndex === index ? 10 : 20}
           />
-        ))}
-        {contextmenu &&
+        ))} */}
+        {contextmenu && (
           <div ref={contextMenuRef}>
             <ContextMenu />
           </div>
-        }
+        )}
         {moveableTargets.map((target, index) => (
           <Moveable
             key={index}
@@ -288,27 +305,22 @@ const Board = React.memo(() => {
             rotatable={false}
             throttleRotate={0}
             rotationPosition={"top"}
-            bounds={{ "left": 0, "top": 0, "right": 0, "bottom": 0, "position": "css" }}
+            bounds={{ left: 0, top: 0, right: 0, bottom: 0, position: "css" }}
             snappable={true}
-
-            onBound={e => {
+            onBound={(e) => {
               console.log(e);
             }}
-
-            onDrag={e => onDrag(e, index)}
-
+            onDrag={(e) => onDrag(e, index)}
             onResize={onResize}
             onRotate={onRotate}
-            style={{ border: 'none', boxShadow: 'none' }} // Inline style
+            style={{ border: "none", boxShadow: "none" }} // Inline style
           />
         ))}
       </div>
-    
-        
-        <div className='flex items-center mt-0.5'>
-          <FullMenu/>
-        </div>
 
+      <div className="flex items-center mt-0.5">
+        <FullMenu />
+      </div>
     </div>
   );
 });

@@ -1,15 +1,20 @@
-import React, { useEffect, useRef, useState, useCallback, memo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { ContextMenuStatechange, setContextMenuDetails } from '../features/players/firstboardPlayersSlice.js';
-import chroma from 'chroma-js';
-import useViewportResize from '../hooks/useViewportResize.js';
+import React, { useEffect, useRef, useState, useCallback, memo } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  ContextMenuStatechange,
+  setContextMenuDetails,
+} from "../features/players/firstboardPlayersSlice.js";
+import chroma from "chroma-js";
+import useViewportResize from "../hooks/useViewportResize.js";
 
-const PlayerComponent = memo(({ player, index, playersref, onMouseEnter, onMouseLeave, onTouchStart, onTouchEnd, zIndex , onMouseMove}) => {
+const PlayerComponent = memo(({ player, index, playersref, zIndex }) => {
   const playerRef = useRef(null);
   const dispatch = useDispatch();
   const breakpoints = useViewportResize();
   const [WandH, setWandH] = useState({ w: 3.55, h: 3.55 });
-  const drawdragcheck=useSelector((state)=> state.board1players.drawordragstarted)
+  const drawdragcheck = useSelector(
+    (state) => state.board1players.drawordragstarted
+  );
 
   useEffect(() => {
     if (breakpoints === 90) {
@@ -17,7 +22,7 @@ const PlayerComponent = memo(({ player, index, playersref, onMouseEnter, onMouse
     } else if (breakpoints === 60) {
       setWandH({ w: 2.46, h: 2.46 });
     } else {
-      setWandH({ w: 2.30, h: 2.30 });
+      setWandH({ w: 2.3, h: 2.3 });
     }
   }, [breakpoints]);
 
@@ -27,7 +32,7 @@ const PlayerComponent = memo(({ player, index, playersref, onMouseEnter, onMouse
 
   const getTextColor = useCallback((color) => {
     const luminance = chroma(color).luminance();
-    return luminance > 0.5 ? '#000000' : '#ffffff';
+    return luminance > 0.5 ? "#000000" : "#ffffff";
   }, []);
 
   const getOuterRingColor = useCallback((innerColor) => {
@@ -36,39 +41,46 @@ const PlayerComponent = memo(({ player, index, playersref, onMouseEnter, onMouse
 
   const playerStyle = {
     top: `${player.y}%`,
-    position: 'absolute',
+    position: "absolute",
     left: `${player.x}%`,
     width: `${WandH.w}vw`,
     height: `${WandH.h}vw`,
-    textAlign: 'center',
+    textAlign: "center",
     margin: 0,
     padding: 0,
     // **Apply zIndex here**
     zIndex,
-    pointerEvents: `${drawdragcheck?'none':'auto'}`
-   };
-
-  const svgStyle = {
-    display: 'block',
-    margin: 0,
-    padding: 0,
-    width: '100%',
-    height: '100%',
+    pointerEvents: `${false ? "none" : "auto"}`,
   };
 
-  const handleContextMenu = useCallback((e) => {
-    e.preventDefault();
-    if (playerRef.current) {
-      const playerRect = playerRef.current.getBoundingClientRect();
-      const boardRect = playerRef.current.closest('.flex').getBoundingClientRect();
+  const svgStyle = {
+    display: "block",
+    margin: 0,
+    padding: 0,
+    width: "100%",
+    height: "100%",
+  };
 
-      const adjustedX = playerRect.left - boardRect.left;
-      const adjustedY = playerRect.bottom - boardRect.top;
+  const handleContextMenu = useCallback(
+    (e) => {
+      e.preventDefault();
+      if (playerRef.current) {
+        const playerRect = playerRef.current.getBoundingClientRect();
+        const boardRect = playerRef.current
+          .closest(".flex")
+          .getBoundingClientRect();
 
-      dispatch(ContextMenuStatechange(true));
-      dispatch(setContextMenuDetails({ id: player.id, x: adjustedX, y: adjustedY }));
-    }
-  }, [dispatch, player.id]);
+        const adjustedX = playerRect.left - boardRect.left;
+        const adjustedY = playerRect.bottom - boardRect.top;
+
+        dispatch(ContextMenuStatechange(true));
+        dispatch(
+          setContextMenuDetails({ id: player.id, x: adjustedX, y: adjustedY })
+        );
+      }
+    },
+    [dispatch, player.id]
+  );
 
   const onLongPress = useCallback((element, callback) => {
     let timer;
@@ -83,21 +95,23 @@ const PlayerComponent = memo(({ player, index, playersref, onMouseEnter, onMouse
       clearTimeout(timer);
     };
 
-    element.addEventListener('touchstart', startPress, { passive: true });
-    element.addEventListener('touchend', cancel, { passive: true });
-    element.addEventListener('touchmove', cancel, { passive: true });
+    element.addEventListener("touchstart", startPress, { passive: true });
+    element.addEventListener("touchend", cancel, { passive: true });
+    element.addEventListener("touchmove", cancel, { passive: true });
 
     return () => {
-      element.removeEventListener('touchstart', startPress, { passive: true });
-      element.removeEventListener('touchend', cancel, { passive: true });
-      element.removeEventListener('touchmove', cancel, { passive: true });
+      element.removeEventListener("touchstart", startPress, {
+        passive: true,
+      });
+      element.removeEventListener("touchend", cancel, { passive: true });
+      element.removeEventListener("touchmove", cancel, { passive: true });
     };
   }, []);
 
   useEffect(() => {
     if (playerRef.current) {
       const cleanUp = onLongPress(playerRef.current, () => {
-        handleContextMenu(new Event('contextmenu'));
+        handleContextMenu(new Event("contextmenu"));
       });
 
       return () => cleanUp();
@@ -108,24 +122,17 @@ const PlayerComponent = memo(({ player, index, playersref, onMouseEnter, onMouse
   const outerRingColor = getOuterRingColor(player.playercolor);
 
   return (
-    <div
+    <svg
       style={playerStyle}
       className="moveable-target"
       ref={playerRef}
       onContextMenu={handleContextMenu}
-      // **Add touch event handlers here**
-      onTouchStart={onTouchStart}
-      onTouchEnd={onTouchEnd}
-      // onMouseEnter={onMouseEnter}
-      // onMouseLeave={onMouseLeave}
-      // onMouseMove={onMouseMove}
+      viewBox="0 0 50 50"
     >
-      <div className="w-full p-0 m-0 flex items-center justify-center">
-        <div className="self-center">
-          {player.name}
-        </div>
-      </div>
-      <svg
+      <g className="w-full p-0 m-0 flex items-center justify-center">
+        <text className="self-center">{player.name}</text>
+      </g>
+      <g
         style={svgStyle}
         viewBox="0 0 50 50"
         preserveAspectRatio="xMidYMid meet"
@@ -156,8 +163,8 @@ const PlayerComponent = memo(({ player, index, playersref, onMouseEnter, onMouse
           cx="25"
           cy="25"
         />
-      </svg>
-    </div>
+      </g>
+    </svg>
   );
 });
 
