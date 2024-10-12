@@ -113,6 +113,8 @@ const Drawingboard = () => {
         }))
       );
 
+      dispatch(playerswithnewposition(players));
+
       setSvgSize({
         width: svgRef.current.clientWidth,
         height: svgRef.current.clientHeight,
