@@ -14,6 +14,7 @@ import {
 import useViewportResize from "../../hooks/useViewportResize";
 import PlayerComponent2 from "./PlayeComponent2";
 import { nanoid } from "@reduxjs/toolkit";
+import Playername from "./Playername";
 
 const Drawingboard = () => {
   const players2 = useSelector((state) => state.board1players.players);
@@ -84,6 +85,7 @@ const Drawingboard = () => {
 
     return () => clearTimeout(timeoutId);
   }, [drawpolystatus]);
+
   useEffect(() => {
     const resizeofwindow = () => {
       if (!svgRef.current) return;
@@ -103,6 +105,14 @@ const Drawingboard = () => {
           polygon.map((point) => [point[0] * wscale, point[1] * hscale])
         )
       );
+      setplayers((prevPlayers) =>
+        prevPlayers.map((player) => ({
+          ...player,
+          x: player.x * wscale, // Scale player's x coordinate
+          y: player.y * hscale, // Scale player's y coordinate
+        }))
+      );
+
       setSvgSize({
         width: svgRef.current.clientWidth,
         height: svgRef.current.clientHeight,
@@ -148,7 +158,7 @@ const Drawingboard = () => {
       dispatch(setdrawingstarted(true));
     }
 
-    if (dragelement.type === "line") {
+    if (dragelement && dragelement.type === "line") {
       setLines(
         lines.map((line, index) => {
           if (index === dragelement.index) {
@@ -671,6 +681,9 @@ const Drawingboard = () => {
               startDragging={startDragging}
               setDragelement={setDragelement}
             />
+          ))}
+          {players.map((player, index) => (
+            <Playername player={player} key={index} index={index} />
           ))}
         </svg>
       </div>

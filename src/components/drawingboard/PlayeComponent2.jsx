@@ -74,16 +74,53 @@ const PlayerComponent2 = memo(
           return "0.25vw"; // Stroke width for 2.3
       }
     };
+
     const fontsize = () => {
       switch (WandH.w) {
         case 3.68:
-          return "1.619vw"; // Stroke width for 3.68
+          return "1.619vw"; // Font size for 3.68
         case 2.46:
-          return "1.084vw"; // Stroke width for 2.46
+          return "1.084vw"; // Font size for 2.46
         default:
-          return "1.01vw"; // Stroke width for 2.3
+          return "1.01vw"; // Font size for 2.3
       }
     };
+
+    const onLongPress = useCallback((element, callback) => {
+      let timer;
+      const startPress = () => {
+        timer = setTimeout(() => {
+          timer = null;
+          callback();
+        }, 700); // Trigger after 700ms
+      };
+
+      const cancel = () => {
+        if (timer) {
+          clearTimeout(timer);
+        }
+      };
+
+      element.addEventListener("touchstart", startPress, { passive: true });
+      element.addEventListener("touchend", cancel, { passive: true });
+      element.addEventListener("touchmove", cancel, { passive: true });
+
+      return () => {
+        element.removeEventListener("touchstart", startPress);
+        element.removeEventListener("touchend", cancel);
+        element.removeEventListener("touchmove", cancel);
+      };
+    }, []);
+
+    useEffect(() => {
+      if (playerRef.current) {
+        const cleanUp = onLongPress(playerRef.current, () => {
+          handleContextMenu(new Event("contextmenu"));
+        });
+
+        return () => cleanUp();
+      }
+    }, [handleContextMenu, onLongPress]);
 
     const textColor = getTextColor(player.playercolor);
     const outerRingColor = getOuterRingColor(player.playercolor);
@@ -94,14 +131,12 @@ const PlayerComponent2 = memo(
           e.stopPropagation();
           startdragline(e);
           setDragelement({ type: "player", index: index });
-          // setOveranobject(true)
         }}
-        onMouseUp={(e) => {}}
+        onMouseUp={() => {}}
         ref={playerRef}
         onContextMenu={handleContextMenu}
         width={`${WandH.w}vw`}
         height={`${WandH.h}vw`}
-        // style={{ display: "flex", gap: "20", margin: "0 auto" }}
       >
         {/* Inner circle (Player color) */}
         <circle
@@ -117,11 +152,11 @@ const PlayerComponent2 = memo(
           style={{ userSelect: "none" }} // Disable text selection
           className="svg-player-number font-bold"
           textAnchor="middle"
-          fontSize={fontsize()} //"15.522"
+          fontSize={fontsize()}
           fill={textColor}
           x={player.x} // Center text horizontally
           y={player.y} // Center text vertically
-          dominantBaseline="middle" // Align text in the middle
+          dominantBaseline="middle"
         >
           {player.playernumber}
         </text>
