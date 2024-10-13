@@ -409,10 +409,17 @@ const Drawingboard = () => {
   //   }
 
   // },[dragline,isDragging])
+  const width = svgRef.current.clientWidth;
+  const height = svgRef.current.clientHeight;
   useEffect(() => {
+    const width = svgRef.current.clientWidth;
+    const height = svgRef.current.clientHeight;
     let string = "";
     for (let i = 0; i < polypoints.length; i++) {
-      string += `${polypoints[i][0]},${polypoints[i][1]}` + " ";
+      string +=
+        `${(polypoints[i][0] / 100) * width},${
+          (polypoints[i][1] / 100) * height
+        }` + " ";
     }
 
     setpolygon(string);
@@ -530,7 +537,7 @@ const Drawingboard = () => {
     }
 
     const { x, y } = getPointerPosition(e);
-    setNextpoint(`${x},${y}`);
+    setNextpoint(`${(x / 100) * width},${(y / 100) * height}`);
   };
 
   const boardStyle = {
@@ -675,10 +682,10 @@ const Drawingboard = () => {
 
           {line != null && (
             <line
-              x1={line.x1}
-              y1={line.y1}
-              x2={line.x2}
-              y2={line.y2}
+              x1={`${line.x1}%`}
+              y1={`${line.y1}%`}
+              x2={`${line.x2}%`}
+              y2={`${line.y2}%`}
               style={{ cursor: "pointer" }}
               stroke="black"
               strokeWidth="5"
@@ -695,8 +702,8 @@ const Drawingboard = () => {
           {polypoints.map((point, index) => (
             <circle
               key={index}
-              cx={point[0]}
-              cy={point[1]}
+              cx={`${point[0]}%`}
+              cy={`${point[1]}%`}
               r="5"
               fill="blue"
               cursor="pointer"
