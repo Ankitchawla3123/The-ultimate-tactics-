@@ -3,6 +3,9 @@ import { act } from "react";
 import ContextMenu from "../../components/ContextMenu";
 
 const initialState = {
+  oldsvgSize: {},
+  currentsvgSize: {},
+
   players: [],
   Playeroptions: [
     { number: 1, color: "#8B0000" }, // Dark Red

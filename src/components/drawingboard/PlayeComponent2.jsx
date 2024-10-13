@@ -143,8 +143,8 @@ const PlayerComponent2 = memo(
           className="svg-player-shape"
           r={getRadius()} // Use getRadius function here
           fill={player.playercolor}
-          cx={player.x} // Center circle horizontally
-          cy={player.y} // Center circle vertically
+          cx={`${player.x}%`} // Set cx as a percentage
+          cy={`${player.y}%`} // Set cy as a percentage
         />
 
         {/* Text inside the circle (Player number) */}
@@ -154,8 +154,8 @@ const PlayerComponent2 = memo(
           textAnchor="middle"
           fontSize={fontsize()}
           fill={textColor}
-          x={player.x} // Center text horizontally
-          y={player.y} // Center text vertically
+          x={`${player.x}%`} // Center text horizontally
+          y={`${player.y}%`} // Center text vertically
           dominantBaseline="middle"
         >
           {player.playernumber}
@@ -167,8 +167,8 @@ const PlayerComponent2 = memo(
           strokeWidth={getStrokeWidth()} // Use getStrokeWidth function here
           fill="none"
           stroke={outerRingColor}
-          cx={player.x} // Center outer circle horizontally
-          cy={player.y} // Center outer circle vertically
+          cx={`${player.x}%`} // Center outer circle horizontally
+          cy={`${player.y}%`} // Center outer circle vertically
         />
       </g>
     );

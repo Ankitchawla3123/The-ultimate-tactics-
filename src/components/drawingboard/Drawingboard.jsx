@@ -1,4 +1,10 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+  useLayoutEffect,
+} from "react";
 import Line from "./Line";
 import Polygon from "./Polygon";
 import { useDispatch, useSelector } from "react-redux";
@@ -22,7 +28,7 @@ const Drawingboard = () => {
   useEffect(() => {
     setplayers(players2);
     console.log(players);
-  }, [players2]);
+  }, [players2.length]);
 
   const viewportwidth = useViewportResize();
   const options = useSelector((state) => state.board1players.Playeroptions);
@@ -51,7 +57,7 @@ const Drawingboard = () => {
   const [nextpoint, setNextpoint] = useState(null);
   const [polypoints, setpolypoints] = useState([]);
   const [polygon, setpolygon] = useState("");
-  const [svgSize, setSvgSize] = useState({ width: 860, height: 531 });
+  const [svgSize, setSvgSize] = useState({ width: 860.15, height: 530.95 });
 
   // console.log(svgSize)
   const [lines, setLines] = useState([]);
@@ -86,54 +92,88 @@ const Drawingboard = () => {
     return () => clearTimeout(timeoutId);
   }, [drawpolystatus]);
 
+  const [svgDimensions, setSvgDimensions] = useState([0, 0]);
+
   useEffect(() => {
-    const resizeofwindow = () => {
-      if (!svgRef.current) return;
-      const wscale = svgRef.current.clientWidth / svgSize.width;
-      const hscale = svgRef.current.clientHeight / svgSize.height;
-      setLines((prevLines) =>
-        prevLines.map((line) => ({
-          ...line,
-          x1: line.x1 * wscale,
-          y1: line.y1 * hscale,
-          x2: line.x2 * wscale,
-          y2: line.y2 * hscale,
-        }))
-      );
-      setPolygons((prevPolygons) =>
-        prevPolygons.map((polygon) =>
-          polygon.map((point) => [point[0] * wscale, point[1] * hscale])
-        )
-      );
-      setplayers((prevPlayers) =>
-        prevPlayers.map((player) => ({
-          ...player,
-          x: player.x * wscale, // Scale player's x coordinate
-          y: player.y * hscale, // Scale player's y coordinate
-        }))
-      );
-
-      dispatch(playerswithnewposition(players));
-
-      setSvgSize({
-        width: svgRef.current.clientWidth,
-        height: svgRef.current.clientHeight,
-      });
+    const updateDimensions = () => {
+      if (svgRef.current) {
+        const { clientWidth, clientHeight } = svgRef.current;
+        setSvgDimensions([clientWidth, clientHeight]);
+      }
     };
-    resizeofwindow();
-    window.addEventListener("resize", resizeofwindow);
+
+    // Set initial dimensions
+    updateDimensions();
+
+    // Add event listener for window resize
+    window.addEventListener("resize", updateDimensions);
     return () => {
-      window.removeEventListener("resize", resizeofwindow);
+      window.removeEventListener("resize", updateDimensions);
     };
-  }, [svgSize.width, svgSize.height, viewportwidth]);
+  }, []);
+  const [svgWidth, svgHeight] = svgDimensions;
+
+  // useEffect(() => {
+  //   if (!svgRef.current) return;
+  //   setSvgSize({
+  //     width: svgRef.current.clientWidth,
+  //     height: svgRef.current.clientHeight,
+  //   });
+  // }, [window.innerWidth, window.innerHeight]);
+
+  // useEffect(() => {
+  //   const resizeofwindow = () => {
+  //     if (!svgRef.current) return;
+  //     const wscale = svgRef.current.clientWidth / svgSize.width;
+  //     const hscale = svgRef.current.clientHeight / svgSize.height;
+  //     setLines((prevLines) =>
+  //       prevLines.map((line) => ({
+  //         ...line,
+  //         x1: line.x1 * wscale,
+  //         y1: line.y1 * hscale,
+  //         x2: line.x2 * wscale,
+  //         y2: line.y2 * hscale,
+  //       }))
+  //     );
+  //     setPolygons((prevPolygons) =>
+  //       prevPolygons.map((polygon) =>
+  //         polygon.map((point) => [point[0] * wscale, point[1] * hscale])
+  //       )
+  //     );
+  //     setplayers((prevPlayers) =>
+  //       prevPlayers.map((player) => ({
+  //         ...player,
+  //         x: player.x * wscale, // Correct scaling logic
+  //         y: player.y * hscale, // Correct scaling logic
+  //       }))
+  //     );
+
+  //     // dispatch(playerswithnewposition(players));
+
+  //     setSvgSize({
+  //       width: svgRef.current.clientWidth,
+  //       height: svgRef.current.clientHeight,
+  //     });
+  //   };
+
+  //   resizeofwindow();
+  //   window.addEventListener("resize", resizeofwindow);
+  //   return () => {
+  //     window.removeEventListener("resize", resizeofwindow);
+  //   };
+  // }, [window.innerWidth, window.innerWidth, viewportwidth]);
 
   const getPointerPosition = (event) => {
     const svg = svgRef.current;
     const { clientX, clientY } = event.type.startsWith("touch")
       ? event.touches[0]
       : event;
-    const { left, top } = svg.getBoundingClientRect();
-    return { x: clientX - left, y: clientY - top };
+
+    const { left, top, width, height } = svg.getBoundingClientRect();
+    const x = ((clientX - left) / width) * 100; // Convert to percentage
+    const y = ((clientY - top) / height) * 100; // Convert to percentage
+
+    return { x, y };
   };
 
   const startDragging = (event, end) => {
@@ -178,7 +218,7 @@ const Drawingboard = () => {
           return line;
         })
       );
-    } else if (dragelement.type === "polygon") {
+    } else if (dragelement && dragelement.type === "polygon") {
       setPolygons(
         polygons.map((polygon, index) => {
           if (index === dragelement.index2) {
@@ -238,6 +278,7 @@ const Drawingboard = () => {
       const svg = svgRef.current;
       const svgWidth = svg.clientWidth;
       const svgHeight = svg.clientHeight;
+
       const deltaX = x - start.x;
       const deltaY = y - start.y;
 
@@ -248,12 +289,7 @@ const Drawingboard = () => {
               const allWithinBounds = polygon.every(([px, py]) => {
                 const newX = px + deltaX;
                 const newY = py + deltaY;
-                return (
-                  newX >= 0 &&
-                  newX <= svgWidth &&
-                  newY >= 0 &&
-                  newY <= svgHeight
-                );
+                return newX >= 0 && newX <= 100 && newY >= 0 && newY <= 100;
               });
 
               if (allWithinBounds) {
@@ -274,12 +310,12 @@ const Drawingboard = () => {
               const isWithinBounds =
                 line.x1 + deltaX >= 0 &&
                 line.x2 + deltaX >= 0 &&
-                line.x1 + deltaX <= svgWidth &&
-                line.x2 + deltaX <= svgWidth &&
+                line.x1 + deltaX <= 100 &&
+                line.x2 + deltaX <= 100 &&
                 line.y1 + deltaY >= 0 &&
                 line.y2 + deltaY >= 0 &&
-                line.y1 + deltaY <= svgHeight &&
-                line.y2 + deltaY <= svgHeight;
+                line.y1 + deltaY <= 100 &&
+                line.y2 + deltaY <= 100;
 
               return isWithinBounds
                 ? {
@@ -301,9 +337,9 @@ const Drawingboard = () => {
             if (index === dragelement.index) {
               const isWithinBounds =
                 player.x + deltaX >= 0 &&
-                player.x + deltaX <= svgWidth &&
+                player.x + deltaX <= 100 &&
                 player.y + deltaY >= 0 &&
-                player.y + deltaY <= svgHeight;
+                player.y + deltaY <= 100;
               return isWithinBounds
                 ? {
                     ...player,
@@ -626,6 +662,7 @@ const Drawingboard = () => {
           ))}
           {polygons.map((polygon, index) => (
             <Polygon
+              svgRef={svgRef}
               key={index}
               polygon={polygon}
               startdragline={startdragline}

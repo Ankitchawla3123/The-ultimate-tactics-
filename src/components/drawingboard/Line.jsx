@@ -8,6 +8,7 @@ const Line = React.memo(
     const drawdragcheck = useSelector(
       (state) => state.board1players.drawordragstarted
     );
+
     return (
       <g className="" style={{ transform: "translateZ(0)", zIndex: 1 }}>
         <defs>
@@ -53,10 +54,10 @@ const Line = React.memo(
         </defs>
 
         <line
-          x1={aline.x1}
-          y1={aline.y1}
-          x2={aline.x2}
-          y2={aline.y2}
+          x1={`${aline.x1}%`} // Convert x1 to percentage
+          y1={`${aline.y1}%`} // Convert y1 to percentage
+          x2={`${aline.x2}%`} // Convert x2 to percentage
+          y2={`${aline.y2}%`} // Convert y2 to percentage
           strokeDasharray={8}
           style={{
             cursor: "pointer",
@@ -80,8 +81,8 @@ const Line = React.memo(
           }}
         />
         <circle
-          cx={aline.x1}
-          cy={aline.y1}
+          cx={`${aline.x1}%`} // Convert x1 to percentage for circle
+          cy={`${aline.y1}%`} // Convert y1 to percentage for circle
           r="5.5"
           fill="transparent"
           cursor="pointer"
@@ -96,8 +97,8 @@ const Line = React.memo(
           }}
         />
         <circle
-          cx={aline.x2}
-          cy={aline.y2}
+          cx={`${aline.x2}%`} // Convert x2 to percentage for circle
+          cy={`${aline.y2}%`} // Convert y2 to percentage for circle
           r="5.5"
           fill="transparent"
           cursor="pointer"
