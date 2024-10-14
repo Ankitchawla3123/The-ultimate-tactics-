@@ -19,11 +19,10 @@ function Polygon({
   index: polygonIndex,
   startDragging,
   setOveranobject,
+  color,
 }) {
-  // State to hold pixel coordinates of the polygon points
   const [pixelPoints, setPixelPoints] = useState([]);
 
-  // Convert percentage points to actual coordinates whenever svgRef changes
   useEffect(() => {
     const calculatePixelPoints = () => {
       const svgWidth = svgRef.current.clientWidth; // Get width from ref
@@ -52,7 +51,9 @@ function Polygon({
       <polygon
         points={pixelPoints.join(" ")} // Use converted points
         style={{ cursor: "", zIndex: "20" }}
-        stroke="black"
+        stroke={color.lineColor}
+        fill={color.lineColor}
+        fillOpacity={0.4}
         strokeWidth="2"
         strokeLinecap="round"
         onMouseDown={(e) => {

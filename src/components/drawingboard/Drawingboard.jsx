@@ -22,7 +22,6 @@ const Drawingboard = () => {
 
   const lineColor = useSelector((state) => state.board1players.drawingcolor);
 
-  console.log(lineColor);
   const viewportwidth = useViewportResize();
   const options = useSelector((state) => state.board1players.Playeroptions);
   const optionindex = useSelector((state) => state.board1players.optionsindex);
@@ -125,20 +124,6 @@ const Drawingboard = () => {
   const [drawlinestatus, setDrawlinestatus] = useState(false);
   const [line, setLine] = useState(null);
   const svgRef = useRef(null);
-
-  useEffect(() => {
-    // Handle MouseUp globally to stop dragging anywhere outside the element
-    const handleMouseUp = (e) => {
-      console.log("m up working");
-      stopDragging(e); // Call stopDragging when the mouse is released
-    };
-    window.addEventListener("mouseup", handleMouseUp);
-
-    // Cleanup function
-    return () => {
-      window.removeEventListener("mouseup", handleMouseUp);
-    };
-  }, [isDragging]);
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -281,18 +266,22 @@ const Drawingboard = () => {
       setPolygons(
         polygons.map((polygon, index) => {
           if (index === dragelement.index2) {
-            return polygon.map((point, index) => {
-              const boundcheck =
-                x <= svgWidth && x >= 0 && y <= svgHeight && y >= 0;
-              if (boundcheck && index === dragelement.index) {
-                return [x, y];
-              }
-              return point;
-            });
+            return {
+              ...polygon,
+              polygon: polygon.polygon.map((point, pointIndex) => {
+                const boundcheck =
+                  x <= svgWidth && x >= 0 && y <= svgHeight && y >= 0;
+                if (boundcheck && pointIndex === dragelement.index) {
+                  return [x, y];
+                }
+                return point;
+              }),
+            };
           }
           return polygon;
         })
       );
+
       // setpolypoints(
       //   polypoints.map((point, index) => {
       //     const boundcheck = (x <= svgWidth && x >= 0 && y <= svgHeight && y >= 0);
@@ -334,30 +323,33 @@ const Drawingboard = () => {
       }
 
       const { x, y } = getPointerPosition(e);
-      const svg = svgRef.current;
-      const svgWidth = svg.clientWidth;
-      const svgHeight = svg.clientHeight;
 
       const deltaX = x - start.x;
       const deltaY = y - start.y;
 
       if (dragelement !== null && dragelement.type === "polygon") {
         setPolygons(
-          polygons.map((polygon, index) => {
+          polygons.map((polygonObj, index) => {
             if (index === dragelement.index) {
-              const allWithinBounds = polygon.every(([px, py]) => {
+              const allWithinBounds = polygonObj.polygon.every(([px, py]) => {
                 const newX = px + deltaX;
                 const newY = py + deltaY;
                 return newX >= 0 && newX <= 100 && newY >= 0 && newY <= 100;
               });
 
               if (allWithinBounds) {
-                return polygon.map(([px, py]) => [px + deltaX, py + deltaY]);
+                return {
+                  ...polygonObj,
+                  polygon: polygonObj.polygon.map(([px, py]) => [
+                    px + deltaX,
+                    py + deltaY,
+                  ]),
+                };
               } else {
-                return polygon;
+                return polygonObj;
               }
             }
-            return polygon;
+            return polygonObj;
           })
         );
       }
@@ -420,6 +412,9 @@ const Drawingboard = () => {
   const stopDragging = (e) => {
     e.preventDefault();
     e.stopPropagation();
+    if (duplicateline != null) {
+      setDuplicateline(null);
+    }
     // console.log(players);
     if (dragelement && dragelement.type === "player") {
       const player = players[dragelement.index];
@@ -494,7 +489,7 @@ const Drawingboard = () => {
   };
 
   const drawlines = (e) => {
-    if (!drawpolystatus) {
+    if (!drawpolystatus && drawstart != null) {
       if (isdrawing && drawlinestatus) {
         if (drawstart != null && !drawdragcheck) {
           dispatch(setdrawingstarted(true));
@@ -527,8 +522,14 @@ const Drawingboard = () => {
     setpolygon("");
     // setpolygon('')
     console.log(drawpolystatus);
-    if (polypoints.length > 1) {
-      setPolygons((prev) => [...prev, polypoints]);
+    if (polypoints.length > 2) {
+      setPolygons((prev) => [
+        ...prev,
+        {
+          color: { lineColor }, // Set the desired color value
+          polygon: polypoints, // Assign the 2D array to the polygonPoints property
+        },
+      ]);
     }
 
     setpolypoints([]);
@@ -618,20 +619,20 @@ const Drawingboard = () => {
   //   console.log(e);
   // };
 
+  const [duplicateline, setDuplicateline] = useState(null);
   const stopDraggingforplayer = (e) => {
+    setTimeout(() => {
+      // setDrawstart(null);
+      setDuplicateline(line);
+      setLine(null);
+
+      // setLine(null);
+    }, 300);
     if (dragelement && dragelement.type == "player") {
       e.preventDefault();
       e.stopPropagation();
       // console.log(players);
 
-      if (isdrawing && drawlinestatus) {
-        if (line != null) {
-          setLines((prev) => [...prev, line]);
-          setDrawstart(null);
-          setLine(null);
-        }
-        // console.log(lines);
-      }
       // if (isDragging) {
       //   e.stopPropagation()
       // }
@@ -640,7 +641,7 @@ const Drawingboard = () => {
         setIsDragging(false);
         setDragline(false);
         // dispatch(setidrawing(false))
-      }, 100); // 0.1 seconds = 100 milliseconds
+      }, 100);
 
       setDragelement(null);
       setDrawlinestatus(false);
@@ -653,6 +654,20 @@ const Drawingboard = () => {
       // }
     }
   };
+
+  useEffect(() => {
+    // Handle MouseUp globally to stop dragging anywhere outside the element
+
+    const handleMouseUp = (e) => {
+      stopDragging(e);
+    };
+    window.addEventListener("mouseup", handleMouseUp);
+
+    // Cleanup function
+    return () => {
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [stopDragging]);
 
   const player = {
     id: nanoid(),
@@ -689,6 +704,9 @@ const Drawingboard = () => {
             draw(e);
           }}
           onMouseMove={(e) => {
+            if (duplicateline != null) {
+              setDuplicateline(null);
+            }
             drag(e);
             drawlines(e);
             draglines(e);
@@ -735,7 +753,8 @@ const Drawingboard = () => {
             <Polygon
               svgRef={svgRef}
               key={index}
-              polygon={polygon}
+              polygon={polygon.polygon}
+              color={polygon.color}
               startdragline={startdragline}
               setOveranobject={setOveranobject}
               setDragelement={setDragelement}
@@ -756,10 +775,24 @@ const Drawingboard = () => {
               strokeLinecap="round"
             />
           )}
+          {duplicateline != null && (
+            <line
+              x1={`${duplicateline.x1}%`}
+              y1={`${duplicateline.y1}%`}
+              x2={`${duplicateline.x2}%`}
+              y2={`${duplicateline.y2}%`}
+              style={{ cursor: "pointer" }}
+              stroke={duplicateline.lineColor}
+              strokeWidth="5"
+              strokeLinecap="round"
+            />
+          )}
           <polygon
             points={`${polygon} ${nextpoint != null ? nextpoint : ""}`}
             style={{ cursor: "" }}
-            stroke="black"
+            stroke={lineColor}
+            fill={lineColor}
+            fillOpacity={0.2}
             strokeWidth="2"
             strokeLinecap="round"
           />
