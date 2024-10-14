@@ -1,13 +1,22 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setdrawingstarted } from "../../features/players/firstboardPlayersSlice";
 
 const Line = React.memo(
-  ({ index, aline, startdragline, startDragging, setDragelement }) => {
+  ({
+    index,
+    aline,
+    startdragline,
+    startDragging,
+    setDragelement,
+    lineColor,
+  }) => {
     const dispatch = useDispatch();
     const drawdragcheck = useSelector(
       (state) => state.board1players.drawordragstarted
     );
+
+    // Local state to hold the color for this specific line
 
     return (
       <g className="" style={{ transform: "translateZ(0)", zIndex: 1 }}>
@@ -59,12 +68,12 @@ const Line = React.memo(
           x2={`${aline.x2}%`} // Convert x2 to percentage
           y2={`${aline.y2}%`} // Convert y2 to percentage
           strokeDasharray={8}
+          stroke={aline.lineColor} // Use the local line color
           style={{
             cursor: "pointer",
             outline: "none",
             WebkitTapHighlightColor: "transparent",
           }}
-          stroke="black"
           strokeWidth="5"
           strokeLinecap="round"
           markerEnd="url(#triangle)"

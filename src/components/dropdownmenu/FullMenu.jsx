@@ -1,13 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
 import DropMenu from "./DropMenu";
 import { useDispatch, useSelector } from "react-redux";
 import { Dropdown2 } from "./Dropdown2";
 import DraggablePlayerOptions from "../DraggablePlayerOptions";
+import { changedrawingcolor } from "../../features/players/firstboardPlayersSlice";
 
 function FullMenu() {
   const currentmode = useSelector((state) => state.board1players.currentmode);
   const drawingtype = useSelector((state) => state.board1players.drawingtype);
   const dispatch = useDispatch();
+  const [color, setColor] = useState("#000000");
+  const onColorChange = (e) => {
+    setColor(e.target.value);
+    dispatch(changedrawingcolor(e.target.value));
+  };
 
   const arrowThickness = 2; // Set the desired thickness here
   const leftarrow = (
@@ -115,31 +121,45 @@ function FullMenu() {
   );
 
   return (
-    <div className="flex flex-col items-center gap-2 md:flex-row md:gap-2 w-full">
-      <div className="flex items-center gap-2 md:gap-4 md:flex-row ">
+    <div className="flex flex-col items-center gap-1.5 xl:flex-row lg:flex-col md:gap-2 md:flex-col w-full">
+      <div className="flex items-center gap-2 md:gap-1 md:flex-row ">
         <DraggablePlayerOptions />
         <div className="flex items-center gap-2 md:flex-row ">
           <DropMenu
             items={{ "Drag&Resize": "🖱️Drag & Resize", Draw: "✏️ Draw" }}
             type={"tool"}
           />
-          {currentmode === "Draw" ? (
-            <DropMenu
-              items={{ line: "━━ Line", polygon: "⬠ Polygon" }}
-              type={"drawtype"}
-            />
-          ) : null}
         </div>
       </div>
-      {currentmode === "Draw" && drawingtype === "line" && (
-        <div className="flex gap-0.25">
-          <Dropdown2 items={{ leftending: leftend, leftarrow: leftarrow }} />
-          <Dropdown2 items={{ normal: normalline, dashed: dashedline }} />
-          <Dropdown2
-            items={{ rightending: rightend, rightarrow: rightarrow }}
+      {currentmode === "Draw" ? (
+        <div className="flex gap-2 items-center">
+          <DropMenu
+            items={{ line: "━━ Line", polygon: "⬠ Polygon" }}
+            type={"drawtype"}
+          />
+          {currentmode === "Draw" && drawingtype === "line" && (
+            <div className="flex gap-0.25  ">
+              <Dropdown2
+                items={{ leftending: leftend, leftarrow: leftarrow }}
+              />
+              <Dropdown2 items={{ normal: normalline, dashed: dashedline }} />
+              <Dropdown2
+                items={{ rightending: rightend, rightarrow: rightarrow }}
+              />
+            </div>
+          )}
+          <input
+            type="color"
+            value={color}
+            onChange={onColorChange}
+            className=" h-6 md:h-9 lg:h-9 w-12 border-2 border-black rounded cursor-pointer"
           />
         </div>
-      )}
+      ) : null}
+
+      {/* {currentmode === "Draw" && (
+
+      )} */}
     </div>
   );
 }

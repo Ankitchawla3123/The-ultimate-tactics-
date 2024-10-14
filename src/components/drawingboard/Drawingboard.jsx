@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useRef,
-  useEffect,
-  useCallback,
-  useLayoutEffect,
-} from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import Line from "./Line";
 import Polygon from "./Polygon";
 import { useDispatch, useSelector } from "react-redux";
@@ -26,6 +20,9 @@ const Drawingboard = () => {
   const players2 = useSelector((state) => state.board1players.players);
   const [players, setplayers] = useState([]);
 
+  const lineColor = useSelector((state) => state.board1players.drawingcolor);
+
+  console.log(lineColor);
   const viewportwidth = useViewportResize();
   const options = useSelector((state) => state.board1players.Playeroptions);
   const optionindex = useSelector((state) => state.board1players.optionsindex);
@@ -174,7 +171,6 @@ const Drawingboard = () => {
       window.removeEventListener("resize", updateDimensions);
     };
   }, []);
-  const [svgWidth, svgHeight] = svgDimensions;
 
   // useEffect(() => {
   //   if (!svgRef.current) return;
@@ -504,7 +500,13 @@ const Drawingboard = () => {
           dispatch(setdrawingstarted(true));
         }
         const { x, y } = getPointerPosition(e);
-        setLine({ x1: drawstart.x, y1: drawstart.y, x2: x, y2: y });
+        setLine({
+          x1: drawstart.x,
+          y1: drawstart.y,
+          x2: x,
+          y2: y,
+          lineColor: lineColor,
+        });
       }
     }
   };
@@ -749,7 +751,7 @@ const Drawingboard = () => {
               x2={`${line.x2}%`}
               y2={`${line.y2}%`}
               style={{ cursor: "pointer" }}
-              stroke="black"
+              stroke={line.lineColor}
               strokeWidth="5"
               strokeLinecap="round"
             />
@@ -805,44 +807,3 @@ const Drawingboard = () => {
 };
 
 export default Drawingboard;
-
-// <g>
-// <line
-// x1={line.x1}
-// y1={line.y1}
-// x2={line.x2}
-// y2={line.y2}
-// style={{ cursor: 'pointer' }}
-// stroke="black"
-// strokeWidth="2"
-// strokeLinecap="round"
-// onMouseDown={(e) => {
-// e.stopPropagation();
-// startdragline(e);
-// }}
-// />
-// <circle
-// cx={line.x1}
-// cy={line.y1}
-// r="5"
-// fill="red"
-// cursor="pointer"
-// onMouseDown={(event) => {
-// event.stopPropagation();
-// startDragging(event, 'start');
-// }}
-// onTouchStart={(event) => startDragging(event, 'start')}
-// />
-// <circle
-// cx={line.x2}
-// cy={line.y2}
-// r="5"
-// fill="blue"
-// cursor="pointer"
-// onMouseDown={(event) => {
-// event.stopPropagation();
-// startDragging(event, 'end');
-// }}
-// onTouchStart={(event) => startDragging(event, 'end')}
-// />
-// </g>

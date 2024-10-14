@@ -31,6 +31,7 @@ const initialState = {
   colorchange: false,
   numberchange: false,
   changeid: "",
+  drawingcolor: "#000000",
 };
 
 const boardonePlayerSlice = createSlice({
@@ -130,6 +131,9 @@ const boardonePlayerSlice = createSlice({
     setdrawingtype: (state, action) => {
       state.drawingtype = action.payload;
     },
+    changedrawingcolor: (state, action) => {
+      state.drawingcolor = action.payload;
+    },
   },
 });
 
@@ -152,6 +156,7 @@ export const {
   setcurrentmode,
   setdrawingtype,
   playerswithnewposition,
+  changedrawingcolor,
 } = boardonePlayerSlice.actions;
 
 export default boardonePlayerSlice.reducer;
