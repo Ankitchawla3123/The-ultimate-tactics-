@@ -25,10 +25,6 @@ import Playername from "./Playername";
 const Drawingboard = () => {
   const players2 = useSelector((state) => state.board1players.players);
   const [players, setplayers] = useState([]);
-  useEffect(() => {
-    setplayers(players2);
-    console.log(players);
-  }, [players2.length]);
 
   const viewportwidth = useViewportResize();
   const options = useSelector((state) => state.board1players.Playeroptions);
@@ -49,6 +45,73 @@ const Drawingboard = () => {
   const drawpolystatus = useSelector(
     (state) => state.board1players.drawpolystatus
   );
+  const namechange = useSelector((state) => state.board1players.namechange);
+  const colorchange = useSelector((state) => state.board1players.colorchange);
+  const numberchange = useSelector((state) => state.board1players.numberchange);
+  const changeid = useSelector((state) => state.board1players.changeid);
+
+  // useEffect(() => {
+  //   setplayers(players2);
+  //   console.log(players);
+  // }, [players2]);
+
+  useEffect(() => {
+    if (players2.length < players.length) {
+      setplayers((prevPlayers) => {
+        return prevPlayers.filter((player) =>
+          players2.some((p) => p.id === player.id)
+        );
+      });
+    } else if (players2.length > players.length) {
+      const lastPlayer = players2[players2.length - 1];
+      if (!players.some((player) => player.id === lastPlayer.id)) {
+        setplayers((prevPlayers) => [...prevPlayers, lastPlayer]);
+      }
+    }
+  }, [players2.length]);
+
+  useEffect(() => {
+    setplayers((prevPlayers) =>
+      prevPlayers.map((player) => {
+        if (player.id === changeid) {
+          return {
+            ...player,
+            name: players2.find((p) => p.id === changeid)?.name,
+          };
+        }
+        return player;
+      })
+    );
+  }, [namechange]);
+
+  useEffect(() => {
+    setplayers((prevPlayers) =>
+      prevPlayers.map((player) => {
+        if (player.id === changeid) {
+          return {
+            ...player,
+            playercolor: players2.find((p) => p.id === changeid)?.playercolor,
+          };
+        }
+        return player;
+      })
+    );
+  }, [colorchange]);
+
+  useEffect(() => {
+    setplayers((prevPlayers) =>
+      prevPlayers.map((player) => {
+        if (player.id === changeid) {
+          return {
+            ...player,
+            playernumber: players2.find((p) => p.id === changeid)?.playernumber,
+          };
+        }
+        return player;
+      })
+    );
+  }, [numberchange]);
+
   const drawdragcheck = useSelector(
     (state) => state.board1players.drawordragstarted
   );
@@ -361,10 +424,10 @@ const Drawingboard = () => {
   const stopDragging = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log(players);
+    // console.log(players);
     if (dragelement && dragelement.type === "player") {
       const player = players[dragelement.index];
-      console.log(player);
+      // console.log(player);
       // Dispatch action to update Redux store with new coordinates
       dispatch(
         updatexy2({
@@ -381,7 +444,7 @@ const Drawingboard = () => {
         setDrawstart(null);
         setLine(null);
       }
-      console.log(lines);
+      // console.log(lines);
     }
     // if (isDragging) {
     //   e.stopPropagation()
@@ -409,8 +472,6 @@ const Drawingboard = () => {
   //   }
 
   // },[dragline,isDragging])
-  const width = svgRef.current.clientWidth;
-  const height = svgRef.current.clientHeight;
   useEffect(() => {
     const width = svgRef.current.clientWidth;
     const height = svgRef.current.clientHeight;
@@ -531,11 +592,12 @@ const Drawingboard = () => {
   };
 
   const nexpointforpoly = (e) => {
+    const width = svgRef.current.clientWidth;
+    const height = svgRef.current.clientHeight;
     if (point === null) return;
     if (!drawdragcheck) {
       dispatch(setdrawingstarted(true));
     }
-
     const { x, y } = getPointerPosition(e);
     setNextpoint(`${(x / 100) * width},${(y / 100) * height}`);
   };
@@ -550,9 +612,9 @@ const Drawingboard = () => {
   };
 
   const [polygons, setPolygons] = useState([]);
-  const stopDragging2 = (e) => {
-    console.log(e);
-  };
+  // const stopDragging2 = (e) => {
+  //   console.log(e);
+  // };
 
   const stopDraggingforplayer = (e) => {
     if (dragelement && dragelement.type == "player") {
@@ -566,7 +628,7 @@ const Drawingboard = () => {
           setDrawstart(null);
           setLine(null);
         }
-        console.log(lines);
+        // console.log(lines);
       }
       // if (isDragging) {
       //   e.stopPropagation()
@@ -729,7 +791,12 @@ const Drawingboard = () => {
             />
           ))}
           {players.map((player, index) => (
-            <Playername player={player} key={index} index={index} />
+            <Playername
+              svgRef={svgRef}
+              player={player}
+              key={index}
+              index={index}
+            />
           ))}
         </svg>
       </div>

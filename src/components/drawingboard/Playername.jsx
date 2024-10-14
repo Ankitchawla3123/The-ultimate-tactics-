@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import useViewportResize from "../../hooks/useViewportResize";
 
-function Playername({ player, index }) {
+function Playername({ player, index, svgRef }) {
   const [WandH, setWandH] = useState({ w: 3.55, h: 3.55 });
   const breakpoints = useViewportResize();
 
@@ -15,6 +15,7 @@ function Playername({ player, index }) {
     }
   }, [breakpoints]);
 
+  // Function to calculate the radius in pixels based on the viewport width
   const getRadius = () => {
     const viewportWidth = window.innerWidth;
     switch (WandH.w) {
@@ -27,11 +28,17 @@ function Playername({ player, index }) {
     }
   };
 
+  // Extract the height of the SVG container from the reference
+  const svgHeight = svgRef.current ? svgRef.current.clientHeight : 0;
+
+  // Calculate the adjustment for y based on the height and radius (in pixels)
+  const yAdjustment = ((1.7 * getRadius()) / svgHeight) * 100; // Convert the adjustment to percentage
+
   return (
     <text
       style={{ userSelect: "none" }} // Disable text selection
-      x={player.x}
-      y={player.y - 1.8 * getRadius()}
+      x={`${player.x}%`} // Keep percentage for x
+      y={`${player.y - yAdjustment}%`} // Adjust y based on the radius, but keep percentage
       dominantBaseline="middle"
       textAnchor="middle"
     >

@@ -26,6 +26,11 @@ const initialState = {
   drawordragstarted: false,
   currentmode: "Drag&Resize",
   drawingtype: "line",
+  playerlengthchange: false,
+  namechange: false,
+  colorchange: false,
+  numberchange: false,
+  changeid: "",
 };
 
 const boardonePlayerSlice = createSlice({
@@ -50,6 +55,8 @@ const boardonePlayerSlice = createSlice({
       return player;
     },
     changeplayernumber: (state, action) => {
+      state.changeid = action.payload.id;
+      state.numberchange = !state.numberchange;
       state.players = state.players.map((player) => {
         if (player.id == action.payload.id) {
           player.playernumber = action.payload.number;
@@ -58,6 +65,9 @@ const boardonePlayerSlice = createSlice({
       });
     },
     ChangeColor: (state, action) => {
+      state.changeid = action.payload.id;
+      state.colorchange = !state.colorchange;
+
       state.players = state.players.map((player) => {
         if (player.id === action.payload.id) {
           player.playercolor = action.payload.color;
@@ -70,6 +80,8 @@ const boardonePlayerSlice = createSlice({
       console.log(state.ContextMenusave);
     },
     ChangePlayername: (state, action) => {
+      state.changeid = action.payload.id;
+      state.namechange = !state.namechange;
       state.players.map((player) => {
         if (player.id === action.payload.id) {
           player.name = action.payload.name;

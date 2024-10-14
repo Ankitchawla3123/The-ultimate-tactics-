@@ -1,21 +1,31 @@
-import React, { useState, useEffect, memo } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { ChangePlayername, changeplayernumber, ChangeColor, removeplayer, ContextMenuStatechange } from '../features/players/firstboardPlayersSlice';
+import React, { useState, useEffect, memo } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  ChangePlayername,
+  changeplayernumber,
+  ChangeColor,
+  removeplayer,
+  ContextMenuStatechange,
+} from "../features/players/firstboardPlayersSlice";
 
 const ContextMenu = memo(() => {
-  const { id, x, y } = useSelector(state => state.board1players.ContextMenusave);
-  const player = useSelector(state => state.board1players.players.find(player => player.id === id));
+  const { id, x, y } = useSelector(
+    (state) => state.board1players.ContextMenusave
+  );
+  const player = useSelector((state) =>
+    state.board1players.players.find((player) => player.id === id)
+  );
   const dispatch = useDispatch();
 
-  const [name, setName] = useState('');
-  const [number, setNumber] = useState('');
-  const [color, setColor] = useState('#ffffff');
+  const [name, setName] = useState("");
+  const [number, setNumber] = useState("");
+  const [color, setColor] = useState("#ffffff");
 
   useEffect(() => {
     if (player) {
-      setName(player.name || '');
-      setNumber(player.playernumber != null ? String(player.playernumber) : '');
-      setColor(player.playercolor || '#ffffff');
+      setName(player.name || "");
+      setNumber(player.playernumber != null ? String(player.playernumber) : "");
+      setColor(player.playercolor || "#ffffff");
     }
   }, [player]);
 
@@ -23,7 +33,7 @@ const ContextMenu = memo(() => {
     left: x,
     top: y,
     position: "absolute",
-    transform: `translate(0%, ${player && player.name ? '30%' : '10%'})`,
+    transform: `translate(0%, ${player && player.name ? "30%" : "10%"})`,
   };
 
   const onNameChange = (e) => {
@@ -32,8 +42,16 @@ const ContextMenu = memo(() => {
   };
 
   const onNumberChange = (e) => {
-    setNumber(e.target.value);
-    dispatch(changeplayernumber({ id, number: e.target.value }));
+    const value = e.target.value;
+
+    // Allow only digits
+    if (/^\d*$/.test(value)) {
+      setNumber(value);
+      // Dispatch the action to update the number immediately
+      if (value !== "") {
+        dispatch(changeplayernumber({ id, number: Number(value) })); // Convert to a number
+      }
+    }
   };
 
   const onColorChange = (e) => {
@@ -51,30 +69,26 @@ const ContextMenu = memo(() => {
   };
 
   return (
-    <div style={styling} className=' z-50'>
+    <div style={styling} className="z-50">
       <input
         type="text"
-        placeholder='Player name'
+        placeholder="Player name"
         value={name}
         onChange={onNameChange}
       />
       <br />
       <input
-        type="number"
-        placeholder='Player number'
+        type="text" // Keep as text input
+        placeholder="Player number"
         value={number}
-        onChange={onNumberChange}
+        onChange={onNumberChange} // Only allow numeric input
       />
       <br />
       <form onSubmit={changethecolor}>
-        <input
-          type="color"
-          value={color}
-          onChange={onColorChange}
-        />
-        <button type='submit'>Change Color</button>
+        <input type="color" value={color} onChange={onColorChange} />
+        <button type="submit">Change Color</button>
       </form>
-      <button onClick={removeaplayer}> Remove Player</button>
+      <button onClick={removeaplayer}>Remove Player</button>
     </div>
   );
 });

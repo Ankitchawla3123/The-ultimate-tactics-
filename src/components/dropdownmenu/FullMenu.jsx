@@ -1,8 +1,8 @@
-import React from 'react';
-import DropMenu from './DropMenu';
-import { useDispatch, useSelector } from 'react-redux';
-import { Dropdown2 } from './Dropdown2';
-import DraggablePlayerOptions from '../DraggablePlayerOptions';
+import React from "react";
+import DropMenu from "./DropMenu";
+import { useDispatch, useSelector } from "react-redux";
+import { Dropdown2 } from "./Dropdown2";
+import DraggablePlayerOptions from "../DraggablePlayerOptions";
 
 function FullMenu() {
   const currentmode = useSelector((state) => state.board1players.currentmode);
@@ -47,49 +47,97 @@ function FullMenu() {
   );
 
   const leftend = (
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+    >
       <path d="M23 13H2v-2h21v2z" fill="#000000" strokeWidth={arrowThickness} />
-      <path d="M32 21V3" stroke="#000000" transform="translate(-29.5, 0)" strokeWidth={arrowThickness} strokeLinecap="round" strokeLinejoin="round" />
+      <path
+        d="M32 21V3"
+        stroke="#000000"
+        transform="translate(-29.5, 0)"
+        strokeWidth={arrowThickness}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
   const rightend = (
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+    >
       <path d="M23 13H2v-2h21v2z" fill="#000000" strokeWidth={arrowThickness} />
-      <path d="M32 21V3" stroke="#000000" transform="translate(-9.5, 0)" strokeWidth={arrowThickness} strokeLinecap="round" strokeLinejoin="round" />
+      <path
+        d="M32 21V3"
+        stroke="#000000"
+        transform="translate(-9.5, 0)"
+        strokeWidth={arrowThickness}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 
   const normalline = (
-    <svg xmlns="http://www.w3.org/2000/svg" height="20" width="20" fill="#000000" viewBox="0 0 24 24">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      height="20"
+      width="20"
+      fill="#000000"
+      viewBox="0 0 24 24"
+    >
       <path d="M23 13H2v-2h21v2z" fill="#000000" strokeWidth={arrowThickness} />
     </svg>
   );
 
   const dashedline = (
-    <svg viewBox="0 0 17 17" height='20' width='20' version="1.1" xmlns="http://www.w3.org/2000/svg">
-      <path d="M0 8h7v1H0v-1zM10 8h7v1h-7v-1z" stroke="#000000" strokeWidth={1} fill="none" />
+    <svg
+      viewBox="0 0 17 17"
+      height="20"
+      width="20"
+      version="1.1"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M0 8h7v1H0v-1zM10 8h7v1h-7v-1z"
+        stroke="#000000"
+        strokeWidth={1}
+        fill="none"
+      />
     </svg>
   );
 
   return (
-    <div className='flex flex-col items-center gap-2 md:flex-row md:gap-2 w-full'>
-  
-      <div className='flex items-center gap-2 md:gap-4 md:flex-row '>
-      <DraggablePlayerOptions/>
-       <div className='flex items-center gap-2 md:flex-row ' >
-       <DropMenu items={{ 'Drag&Resize': '🖱️Drag & Resize', 'Draw': '✏️ Draw' }} type={'tool'} />
-        {
-          currentmode === 'Draw'?(<DropMenu items={{ 'line': '━━ Line', 'polygon': '⬠ Polygon' }} type={'drawtype'} />):null
-        }
-        
-       </div>
-        
+    <div className="flex flex-col items-center gap-2 md:flex-row md:gap-2 w-full">
+      <div className="flex items-center gap-2 md:gap-4 md:flex-row ">
+        <DraggablePlayerOptions />
+        <div className="flex items-center gap-2 md:flex-row ">
+          <DropMenu
+            items={{ "Drag&Resize": "🖱️Drag & Resize", Draw: "✏️ Draw" }}
+            type={"tool"}
+          />
+          {currentmode === "Draw" ? (
+            <DropMenu
+              items={{ line: "━━ Line", polygon: "⬠ Polygon" }}
+              type={"drawtype"}
+            />
+          ) : null}
+        </div>
       </div>
-      {currentmode === 'Draw' && drawingtype === 'line' && (
-        <div className='flex gap-0.25'>
-          <Dropdown2 items={{ 'leftending': leftend, 'leftarrow': leftarrow }} />
-          <Dropdown2 items={{ 'normal': normalline, 'dashed': dashedline }} />
-          <Dropdown2 items={{ 'rightending': rightend, 'rightarrow': rightarrow }} />
+      {currentmode === "Draw" && drawingtype === "line" && (
+        <div className="flex gap-0.25">
+          <Dropdown2 items={{ leftending: leftend, leftarrow: leftarrow }} />
+          <Dropdown2 items={{ normal: normalline, dashed: dashedline }} />
+          <Dropdown2
+            items={{ rightending: rightend, rightarrow: rightarrow }}
+          />
         </div>
       )}
     </div>

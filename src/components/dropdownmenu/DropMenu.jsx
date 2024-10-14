@@ -1,5 +1,4 @@
 import * as React from "react";
-
 import {
   Select,
   SelectContent,
@@ -22,27 +21,26 @@ function DropMenu({ items, type }) {
   const currentmode = useSelector((state) => state.board1players.currentmode);
   const drawingtype = useSelector((state) => state.board1players.drawingtype);
   const dispatch = useDispatch();
-  if (currentmode === "Draw") {
-    dispatch(setidrawing(true));
-    if (drawingtype === "polygon") {
-      dispatch(setdrawpolystatus(true));
-    } else {
-      dispatch(setdrawpolystatus(false));
+
+  // Move side effects related to currentmode and drawingtype inside useEffect
+  React.useEffect(() => {
+    if (currentmode === "Draw") {
+      dispatch(setidrawing(true));
+      dispatch(setdrawpolystatus(drawingtype === "polygon"));
+    } else if (currentmode === "Drag&Resize") {
+      dispatch(setidrawing(false));
     }
-  }
-  if (currentmode === "Drag&Resize") {
-    dispatch(setidrawing(false));
-  }
+  }, [currentmode, drawingtype, dispatch]); // Add these dependencies
 
   const savestate = (value) => {
     setselectstate(value);
     if (type === "tool") {
       dispatch(setcurrentmode(value));
-    }
-    if (type === "drawtype") {
+    } else if (type === "drawtype") {
       dispatch(setdrawingtype(value));
     }
   };
+
   return (
     <div>
       <Select className="" value={selectstate} onValueChange={savestate}>
