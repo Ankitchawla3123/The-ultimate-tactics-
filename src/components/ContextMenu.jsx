@@ -27,6 +27,9 @@ const ContextMenu = memo(() => {
   const [number, setNumber] = useState("");
   const [color, setColor] = useState("#ffffff");
   const shaperemoval = useSelector((state) => state.board1players.shaperemoval);
+  const shapecolorforcontextmenu = useSelector(
+    (state) => state.board1players.shapecolorforcontextmenu
+  );
 
   const [color2, setColor2] = useState(
     useSelector((state) => state.board1players.shapecolorforcontextmenu)
@@ -40,6 +43,10 @@ const ContextMenu = memo(() => {
     console.log(color2);
     dispatch(setshapecolorforcontextmenu(color2));
   };
+
+  useEffect(() => {
+    setColor2(shapecolorforcontextmenu);
+  }, [shapecolorforcontextmenu]);
   useEffect(() => {
     if (player) {
       setName(player.name || "");
