@@ -1,4 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import {
+  changeContextMenutype,
+  ContextMenuStatechange,
+  setContextMenuDetails,
+  setshapecolorforcontextmenu,
+} from "../../features/players/firstboardPlayersSlice";
 
 // Utility function to debounce a function
 const debounce = (func, delay) => {
@@ -22,7 +29,7 @@ function Polygon({
   color,
 }) {
   const [pixelPoints, setPixelPoints] = useState([]);
-
+  const dispatch = useDispatch();
   useEffect(() => {
     const calculatePixelPoints = () => {
       const svgWidth = svgRef.current.clientWidth; // Get width from ref
@@ -46,13 +53,38 @@ function Polygon({
     };
   }, [polygon, svgRef]); // Depend on polygon and svgRef
 
+  const handleContextMenu = useCallback(
+    (e) => {
+      console.log(color);
+      e.preventDefault();
+      if (svgRef.current) {
+        const svgRect = svgRef.current.getBoundingClientRect();
+        const adjustedX = e.clientX - svgRect.left;
+        const adjustedY = e.clientY - svgRect.top;
+
+        dispatch(ContextMenuStatechange(true));
+        dispatch(changeContextMenutype("shape"));
+        dispatch(setshapecolorforcontextmenu(color));
+        dispatch(
+          setContextMenuDetails({
+            type: "polygon",
+            id: polygonIndex,
+            x: adjustedX,
+            y: adjustedY,
+          })
+        );
+      }
+    },
+    [dispatch, polygonIndex, svgRef, color]
+  );
+
   return (
-    <g>
+    <g onContextMenu={handleContextMenu}>
       <polygon
         points={pixelPoints.join(" ")} // Use converted points
         style={{ cursor: "", zIndex: "20" }}
-        stroke={color.lineColor}
-        fill={color.lineColor}
+        stroke={color}
+        fill={color}
         fillOpacity={0.4}
         strokeWidth="2"
         strokeLinecap="round"

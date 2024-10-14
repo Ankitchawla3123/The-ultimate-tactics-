@@ -45,11 +45,58 @@ const Drawingboard = () => {
   const colorchange = useSelector((state) => state.board1players.colorchange);
   const numberchange = useSelector((state) => state.board1players.numberchange);
   const changeid = useSelector((state) => state.board1players.changeid);
+  const shapecolorforcontextmenu = useSelector(
+    (state) => state.board1players.shapecolorforcontextmenu
+  );
+  const ContextMenusave = useSelector(
+    (state) => state.board1players.ContextMenusave
+  );
+  const shaperemoval = useSelector((state) => state.board1players.shaperemoval);
 
   // useEffect(() => {
   //   setplayers(players2);
   //   console.log(players);
   // }, [players2]);
+
+  // Updating color for both polygons and lines
+  useEffect(() => {
+    if (ContextMenusave.type === "polygon") {
+      // Update color for polygons
+      setPolygons((polygons) =>
+        polygons.map((polygon, index) => {
+          if (index === ContextMenusave.id) {
+            return { ...polygon, color: shapecolorforcontextmenu }; // Update polygon color
+          }
+          return polygon;
+        })
+      );
+    } else if (ContextMenusave.type === "line") {
+      // Update color for lines
+      setLines((lines) =>
+        lines.map((line, index) => {
+          if (index === ContextMenusave.id) {
+            return { ...line, lineColor: shapecolorforcontextmenu }; // Update line color
+          }
+          return line;
+        })
+      );
+    }
+  }, [shapecolorforcontextmenu]);
+
+  // Removing polygon or line based on context menu type
+  useEffect(() => {
+    if (ContextMenusave.type === "polygon") {
+      // Remove the polygon at the index specified by ContextMenusave.id
+      setPolygons((polygons) =>
+        polygons.filter((_, index) => index !== ContextMenusave.id)
+      );
+    } else if (ContextMenusave.type === "line") {
+      // Remove the line at the index specified by ContextMenusave.id
+      setLines((lines) =>
+        lines.filter((_, index) => index !== ContextMenusave.id)
+      );
+    }
+  }, [shaperemoval]);
 
   useEffect(() => {
     if (players2.length < players.length) {
@@ -526,7 +573,7 @@ const Drawingboard = () => {
       setPolygons((prev) => [
         ...prev,
         {
-          color: { lineColor }, // Set the desired color value
+          color: lineColor, // Set the desired color value
           polygon: polypoints, // Assign the 2D array to the polygonPoints property
         },
       ]);
@@ -739,6 +786,7 @@ const Drawingboard = () => {
         >
           {lines.map((line, index) => (
             <Line
+              svgRef={svgRef}
               className="z-30"
               key={index}
               aline={line}

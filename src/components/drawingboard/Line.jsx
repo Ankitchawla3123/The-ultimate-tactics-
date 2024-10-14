@@ -1,6 +1,12 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setdrawingstarted } from "../../features/players/firstboardPlayersSlice";
+import {
+  changeContextMenutype,
+  ContextMenuStatechange,
+  setContextMenuDetails,
+  setdrawingstarted,
+  setshapecolorforcontextmenu,
+} from "../../features/players/firstboardPlayersSlice";
 
 const Line = React.memo(
   ({
@@ -10,16 +16,45 @@ const Line = React.memo(
     startDragging,
     setDragelement,
     lineColor,
+    svgRef,
   }) => {
     const dispatch = useDispatch();
     const drawdragcheck = useSelector(
       (state) => state.board1players.drawordragstarted
     );
 
+    const handleContextMenu = useCallback(
+      (e) => {
+        e.preventDefault();
+        if (svgRef.current) {
+          const svgRect = svgRef.current.getBoundingClientRect();
+          const adjustedX = e.clientX - svgRect.left;
+          const adjustedY = e.clientY - svgRect.top;
+
+          dispatch(ContextMenuStatechange(true));
+          dispatch(changeContextMenutype("shape"));
+          dispatch(setshapecolorforcontextmenu(aline.lineColor));
+          dispatch(
+            setContextMenuDetails({
+              type: "line",
+              id: index,
+              x: adjustedX,
+              y: adjustedY,
+            })
+          );
+        }
+      },
+      [dispatch, svgRef, aline.lineColor]
+    );
+
     // Local state to hold the color for this specific line
 
     return (
-      <g className="" style={{ transform: "translateZ(0)", zIndex: 1 }}>
+      <g
+        onContextMenu={handleContextMenu}
+        className=""
+        style={{ transform: "translateZ(0)", zIndex: 1 }}
+      >
         <defs>
           <marker
             id="triangle"

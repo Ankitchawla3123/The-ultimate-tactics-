@@ -32,6 +32,9 @@ const initialState = {
   numberchange: false,
   changeid: "",
   drawingcolor: "#000000",
+  ContextMenutype: "player",
+  shapecolorforcontextmenu: "",
+  shaperemoval: false,
 };
 
 const boardonePlayerSlice = createSlice({
@@ -134,6 +137,15 @@ const boardonePlayerSlice = createSlice({
     changedrawingcolor: (state, action) => {
       state.drawingcolor = action.payload;
     },
+    changeContextMenutype: (state, action) => {
+      state.ContextMenutype = action.payload;
+    },
+    setshapecolorforcontextmenu: (state, action) => {
+      state.shapecolorforcontextmenu = action.payload;
+    },
+    setshapremoval: (state, action) => {
+      state.shaperemoval = action.payload;
+    },
   },
 });
 
@@ -157,6 +169,9 @@ export const {
   setdrawingtype,
   playerswithnewposition,
   changedrawingcolor,
+  changeContextMenutype,
+  setshapecolorforcontextmenu,
+  setshapremoval,
 } = boardonePlayerSlice.actions;
 
 export default boardonePlayerSlice.reducer;

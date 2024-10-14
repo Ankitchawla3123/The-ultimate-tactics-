@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState, useCallback, memo } from "react";
 import { useDispatch } from "react-redux";
 import chroma from "chroma-js";
 import {
+  changeContextMenutype,
   ContextMenuStatechange,
   setContextMenuDetails,
 } from "../../features/players/firstboardPlayersSlice.js";
@@ -45,8 +46,15 @@ const PlayerComponent2 = memo(
           const adjustedY = playerRect.bottom - boardRect.top;
 
           dispatch(ContextMenuStatechange(true));
+
+          dispatch(changeContextMenutype("player"));
           dispatch(
-            setContextMenuDetails({ id: player.id, x: adjustedX, y: adjustedY })
+            setContextMenuDetails({
+              type: "player",
+              id: player.id,
+              x: adjustedX,
+              y: adjustedY,
+            })
           );
         }
       },

@@ -6,12 +6,18 @@ import {
   ChangeColor,
   removeplayer,
   ContextMenuStatechange,
+  setshapecolorforcontextmenu,
+  setshapremoval,
 } from "../features/players/firstboardPlayersSlice";
 
 const ContextMenu = memo(() => {
   const { id, x, y } = useSelector(
     (state) => state.board1players.ContextMenusave
   );
+  const ContextMenutype = useSelector(
+    (state) => state.board1players.ContextMenutype
+  );
+
   const player = useSelector((state) =>
     state.board1players.players.find((player) => player.id === id)
   );
@@ -20,7 +26,20 @@ const ContextMenu = memo(() => {
   const [name, setName] = useState("");
   const [number, setNumber] = useState("");
   const [color, setColor] = useState("#ffffff");
+  const shaperemoval = useSelector((state) => state.board1players.shaperemoval);
 
+  const [color2, setColor2] = useState(
+    useSelector((state) => state.board1players.shapecolorforcontextmenu)
+  );
+  const onColorChange2 = (e) => {
+    setColor2(e.target.value);
+  };
+
+  const changethecolor2 = (e) => {
+    e.preventDefault();
+    console.log(color2);
+    dispatch(setshapecolorforcontextmenu(color2));
+  };
   useEffect(() => {
     if (player) {
       setName(player.name || "");
@@ -33,7 +52,7 @@ const ContextMenu = memo(() => {
     left: x,
     top: y,
     position: "absolute",
-    transform: `translate(0%, ${player && player.name ? "30%" : "10%"})`,
+    transform: `translate(0%, 10%)`,
   };
 
   const onNameChange = (e) => {
@@ -67,28 +86,47 @@ const ContextMenu = memo(() => {
     dispatch(removeplayer(player.id));
     dispatch(ContextMenuStatechange(false));
   };
+  const removaeashape = (e) => {
+    dispatch(setshapremoval(!shaperemoval));
+    dispatch(ContextMenuStatechange(false));
+  };
 
+  // Render the context menu based on type
   return (
     <div style={styling} className="z-50">
-      <input
-        type="text"
-        placeholder="Player name"
-        value={name}
-        onChange={onNameChange}
-      />
-      <br />
-      <input
-        type="text" // Keep as text input
-        placeholder="Player number"
-        value={number}
-        onChange={onNumberChange} // Only allow numeric input
-      />
-      <br />
-      <form onSubmit={changethecolor}>
-        <input type="color" value={color} onChange={onColorChange} />
-        <button type="submit">Change Color</button>
-      </form>
-      <button onClick={removeaplayer}>Remove Player</button>
+      {ContextMenutype === "player" ? (
+        <>
+          <input
+            type="text"
+            placeholder="Player name"
+            value={name}
+            onChange={onNameChange}
+          />
+          <br />
+          <input
+            type="text" // Keep as text input
+            placeholder="Player number"
+            value={number}
+            onChange={onNumberChange} // Only allow numeric input
+          />
+          <br />
+          <form onSubmit={changethecolor}>
+            <input type="color" value={color} onChange={onColorChange} />
+            <button type="submit">Change Color</button>
+          </form>
+          <button onClick={removeaplayer}>Remove Player</button>
+        </>
+      ) : ContextMenutype === "shape" ? (
+        <div>
+          <form onSubmit={changethecolor2}>
+            <input type="color" value={color2} onChange={onColorChange2} />
+            <button type="submit">Change Color</button>
+          </form>
+          <button className=" bg-white text-black p-1 " onClick={removaeashape}>
+            Remove
+          </button>
+        </div>
+      ) : null}
     </div>
   );
 });
