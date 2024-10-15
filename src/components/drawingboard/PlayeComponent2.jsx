@@ -16,9 +16,9 @@ const PlayerComponent2 = memo(
     const [WandH, setWandH] = useState({ w: 3.55, h: 3.55 });
 
     useEffect(() => {
-      if (breakpoints === 90) {
+      if (breakpoints === 94.824) {
         setWandH({ w: 3.68, h: 3.68 });
-      } else if (breakpoints === 60) {
+      } else if (breakpoints === 63.216) {
         setWandH({ w: 2.46, h: 2.46 });
       } else {
         setWandH({ w: 2.3, h: 2.3 });

@@ -38,7 +38,7 @@ const Board = React.memo(() => {
     height: "auto",
     position: "relative",
     backgroundColor: "green",
-    aspectRatio: "1.62",
+    aspectRatio: "1.60",
   };
 
   const dispatch = useDispatch();
@@ -263,7 +263,7 @@ const Board = React.memo(() => {
         // onDrop={handleDrop}
         onDragOver={(e) => e.preventDefault()}
       >
-        <div className=" relative w-11/12 h-auto bg-green border-red-50 border-solid border-2 z-10">
+        <div className=" relative  w-85per h-auto bg-green z-10">
           <FootballField />
         </div>
         <div className="absolute ">

@@ -6,16 +6,26 @@ function Playername({ player, index, svgRef }) {
   const breakpoints = useViewportResize();
 
   useEffect(() => {
-    if (breakpoints === 90) {
+    if (breakpoints === 94.824) {
       setWandH({ w: 3.68, h: 3.68 });
-    } else if (breakpoints === 60) {
+    } else if (breakpoints === 63.216) {
       setWandH({ w: 2.46, h: 2.46 });
     } else {
       setWandH({ w: 2.3, h: 2.3 });
     }
   }, [breakpoints]);
 
-  // Function to calculate the radius in pixels based on the viewport width
+  const fontsize = () => {
+    switch (WandH.w) {
+      case 3.68:
+        return "1.619vw"; // Font size for 3.68
+      case 2.46:
+        return "1.084vw"; // Font size for 2.46
+      default:
+        return "1.01vw"; // Font size for 2.3
+    }
+  };
+
   const getRadius = () => {
     const viewportWidth = window.innerWidth;
     switch (WandH.w) {
@@ -41,6 +51,7 @@ function Playername({ player, index, svgRef }) {
       y={`${player.y - yAdjustment}%`} // Adjust y based on the radius, but keep percentage
       dominantBaseline="middle"
       textAnchor="middle"
+      fontSize={fontsize()}
     >
       {player.name}
     </text>

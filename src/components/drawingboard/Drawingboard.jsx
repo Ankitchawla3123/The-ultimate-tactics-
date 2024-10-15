@@ -657,7 +657,7 @@ const Drawingboard = () => {
     height: "auto",
     position: "relative",
     // backgroundColor: 'green',
-    aspectRatio: "1.62",
+    aspectRatio: "1.60",
     zIndex: 20,
   };
 
