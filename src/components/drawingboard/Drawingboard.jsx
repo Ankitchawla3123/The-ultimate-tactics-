@@ -600,7 +600,6 @@ const Drawingboard = () => {
       setPoint([x, y]);
     }
     setpolypoints((prev) => [...prev, [x, y]]);
-    console.log(polypoints);
   };
 
   const handleDrop = (e) => {

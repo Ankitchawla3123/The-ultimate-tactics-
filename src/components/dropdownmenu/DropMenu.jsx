@@ -30,6 +30,7 @@ function DropMenu({ items, type }) {
     } else if (currentmode === "Drag&Resize") {
       dispatch(setidrawing(false));
       dispatch(setdrawpolystatus(false));
+      dispatch(setdrawingtype("line"));
     }
   }, [currentmode, drawingtype, dispatch]); // Add these dependencies
 
