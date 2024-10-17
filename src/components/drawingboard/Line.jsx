@@ -17,6 +17,7 @@ const Line = React.memo(
     setDragelement,
     lineColor,
     svgRef,
+    polypointsemptychk,
   }) => {
     const dispatch = useDispatch();
     const drawdragcheck = useSelector(
@@ -25,6 +26,9 @@ const Line = React.memo(
 
     const handleContextMenu = useCallback(
       (e) => {
+        // if (!polypointsemptychk) {
+        //   return;
+        // }
         e.preventDefault();
         if (svgRef.current) {
           const svgRect = svgRef.current.getBoundingClientRect();

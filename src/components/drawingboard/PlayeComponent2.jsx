@@ -9,7 +9,14 @@ import {
 import useViewportResize from "../../hooks/useViewportResize.js";
 
 const PlayerComponent2 = memo(
-  ({ player, index, startdragline, startDragging, setDragelement }) => {
+  ({
+    player,
+    index,
+    startdragline,
+    startDragging,
+    setDragelement,
+    polypointsemptychk,
+  }) => {
     const playerRef = useRef(null);
     const dispatch = useDispatch();
     const breakpoints = useViewportResize();
@@ -36,6 +43,9 @@ const PlayerComponent2 = memo(
 
     const handleContextMenu = useCallback(
       (e) => {
+        // if (!polypointsemptychk) {
+        //   return;
+        // }
         e.preventDefault();
         if (playerRef.current) {
           const playerRect = playerRef.current.getBoundingClientRect();

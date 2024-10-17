@@ -35,6 +35,7 @@ const initialState = {
   ContextMenutype: "player",
   shapecolorforcontextmenu: "",
   shaperemoval: false,
+  shapegettingdrawn: false,
 };
 
 const boardonePlayerSlice = createSlice({

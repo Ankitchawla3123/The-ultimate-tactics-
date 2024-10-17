@@ -53,6 +53,47 @@ const Board = React.memo(() => {
   const [formation, setFormation] = useState([4, 1, 2, 1, 2]);
   const currentmode = useSelector((state) => state.board1players.currentmode);
 
+  const setformationPercentway = () => {
+    const playersposition = [];
+    const formationlength = formation.length;
+    if (formation != []) {
+      playersposition.push("1:1");
+      for (let i = 1; i <= formation.length; i++) {
+        for (let j = 0; j < formation[i - 1]; j++) {
+          playersposition.push(`${i + 1}:${j + 1}`);
+        }
+      }
+    }
+    console.log(playersposition);
+
+    const rect = boardRef.current.getBoundingClientRect();
+    const normalw = rect.width;
+    const normalh = rect.height;
+    const fieldportw = (rect.width * 89) / 100;
+    const fieldporth = (rect.height * 89) / 100;
+    const xnonfield = ((normalw - fieldportw) / 2 / fieldportw) * 100;
+    const ynonfield = ((normalh - fieldporth) / 2 / fieldporth) * 100;
+    const defencelinestartx = xnonfield * 2;
+    const defencelinestarty = 90;
+    console.log(defencelinestarty);
+
+    dispatch(
+      addplayers({
+        id: nanoid(),
+        playername: "",
+        playercolor: "red",
+        position: "lb",
+        playernumber: 3,
+        x: defencelinestartx,
+        y: defencelinestarty,
+        x2: 10,
+        y2: 10,
+      })
+    );
+  };
+
+  // setformationPercentway();
+
   const setformations = () => {
     const dimensions = getPlayerDimensions(viewportwidth);
     const viewportWidth = window.innerWidth;
@@ -253,6 +294,10 @@ const Board = React.memo(() => {
     setHoveredIndex(null);
   };
 
+  const handleformation = () => {
+    setformationPercentway();
+  };
+
   return (
     <div className="flex flex-col">
       <div
@@ -321,6 +366,7 @@ const Board = React.memo(() => {
       <div className="flex items-center mt-0.5">
         <FullMenu />
       </div>
+      <button onClick={handleformation}>add formation</button>
     </div>
   );
 });

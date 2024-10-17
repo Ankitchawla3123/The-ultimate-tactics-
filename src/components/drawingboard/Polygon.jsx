@@ -27,6 +27,7 @@ function Polygon({
   startDragging,
   setOveranobject,
   color,
+  polypointsemptychk,
 }) {
   const [pixelPoints, setPixelPoints] = useState([]);
   const dispatch = useDispatch();
@@ -55,6 +56,9 @@ function Polygon({
 
   const handleContextMenu = useCallback(
     (e) => {
+      // if (!polypointsemptychk) {
+      //   return;
+      // }
       console.log(color);
       e.preventDefault();
       if (svgRef.current) {

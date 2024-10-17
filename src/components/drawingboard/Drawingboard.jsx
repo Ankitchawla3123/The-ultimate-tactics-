@@ -52,6 +52,9 @@ const Drawingboard = () => {
     (state) => state.board1players.ContextMenusave
   );
   const shaperemoval = useSelector((state) => state.board1players.shaperemoval);
+  const ContextMenuState = useSelector(
+    (state) => state.board1players.ContextMenuState
+  );
 
   // useEffect(() => {
   //   setplayers(players2);
@@ -59,6 +62,7 @@ const Drawingboard = () => {
   // }, [players2]);
 
   // Updating color for both polygons and lines
+
   useEffect(() => {
     if (ContextMenusave.type === "polygon") {
       // Update color for polygons
@@ -183,6 +187,15 @@ const Drawingboard = () => {
 
     return () => clearTimeout(timeoutId);
   }, [drawpolystatus]);
+  const [polypointsemptychk, setPolypointsemptychk] = useState(true);
+
+  useEffect(() => {
+    if (polypoints != []) {
+      setPolypointsemptychk(false);
+    } else if (polypoints == []) {
+      setPolypointsemptychk(true);
+    }
+  }, [polypoints]);
 
   const [svgDimensions, setSvgDimensions] = useState([0, 0]);
 
@@ -484,6 +497,7 @@ const Drawingboard = () => {
       }
       // console.log(lines);
     }
+
     // if (isDragging) {
     //   e.stopPropagation()
     // }
@@ -591,7 +605,14 @@ const Drawingboard = () => {
   // }
 
   const startdrawingpolygon = (e) => {
-    if (!drawpolystatus || isDragging || dragline || overanobject) return;
+    if (
+      !drawpolystatus ||
+      isDragging ||
+      dragline ||
+      overanobject ||
+      ContextMenuState
+    )
+      return;
 
     const { x, y } = getPointerPosition(e);
     if (point === null) {
@@ -715,17 +736,6 @@ const Drawingboard = () => {
     };
   }, [stopDragging]);
 
-  const player = {
-    id: nanoid(),
-    playername: "",
-    playercolor: "red",
-    position: "lb",
-    playernumber: 1,
-    x: 50,
-    y: 50,
-    x2: 50,
-    y2: 50,
-  };
   return (
     <div>
       <div
@@ -785,6 +795,7 @@ const Drawingboard = () => {
         >
           {lines.map((line, index) => (
             <Line
+              polypointsemptychk={polypointsemptychk}
               svgRef={svgRef}
               className="z-30"
               key={index}
@@ -798,6 +809,7 @@ const Drawingboard = () => {
           ))}
           {polygons.map((polygon, index) => (
             <Polygon
+              polypointsemptychk={polypointsemptychk}
               svgRef={svgRef}
               key={index}
               polygon={polygon.polygon}
@@ -864,6 +876,7 @@ const Drawingboard = () => {
           ))}
           {players.map((player, index) => (
             <PlayerComponent2
+              polypointsemptychk={polypointsemptychk}
               player={player}
               key={index}
               index={index}
