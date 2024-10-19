@@ -50,7 +50,7 @@ const Board = React.memo(() => {
   const playersref = useRef([]);
   const boardRef = useRef(null);
   const contextMenuRef = useRef(null);
-  const [formation, setFormation] = useState([4, 1, 2, 1, 2]);
+  const [formation, setFormation] = useState([4, 3, 2, 1]);
   const currentmode = useSelector((state) => state.board1players.currentmode);
 
   const setformationPercentway = () => {
@@ -77,19 +77,46 @@ const Board = React.memo(() => {
     const defencelinestarty = 90;
     console.log(defencelinestarty);
 
-    dispatch(
-      addplayers({
-        id: nanoid(),
-        playername: "",
-        playercolor: "red",
-        position: "lb",
-        playernumber: 3,
-        x: defencelinestartx,
-        y: defencelinestarty,
-        x2: 10,
-        y2: 10,
-      })
-    );
+    const xgap = (47.9 - defencelinestartx - 4.55) / (formation.length - 1);
+    for (let i = 0; i < formation.length; i++) {
+      const intervals = formation[i] + 1;
+      const gap = (89.97 + 6) / intervals;
+      console.log(gap);
+      for (let j = 1; j < intervals; j++) {
+        console.log(`Dispatching player number ${j}`);
+        dispatch(
+          addplayers({
+            id: nanoid(),
+            playername: "",
+            playercolor: "red",
+            position: "lb",
+            playernumber: j + 1,
+            x: defencelinestartx + 4.55 + xgap * i, // defencelinestartx + 4.55
+            y: 2 + j * gap,
+            x2: 10,
+            y2: 10,
+          })
+        );
+
+        // Log the current state after dispatch
+        // console.log(store.getState().players); // Assuming `players` is where you store the list
+      }
+    }
+
+    console.log(players);
+    // dispatch(
+    //   addplayers({
+    //     id: nanoid(),
+    //     playername: "",
+    //     playercolor: "red",
+    //     position: "lb",
+    //     playernumber: 3,
+    //     x: defencelinestartx,
+    //     y: defencelinestarty,
+    //     x2: 10,
+    //     y2: 10,
+    //   })
+    // );
   };
 
   // setformationPercentway();

@@ -110,10 +110,13 @@ const Drawingboard = () => {
         );
       });
     } else if (players2.length > players.length) {
-      const lastPlayer = players2[players2.length - 1];
-      if (!players.some((player) => player.id === lastPlayer.id)) {
-        setplayers((prevPlayers) => [...prevPlayers, lastPlayer]);
-      }
+      const lengthDifference = players2.length - players.length;
+
+      // Find the last `lengthDifference` players from players2
+      const newPlayers = players2.slice(-lengthDifference);
+
+      // Add all the new players to the current players state
+      setplayers((prevPlayers) => [...prevPlayers, ...newPlayers]);
     }
   }, [players2.length]);
 
